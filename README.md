@@ -1,7 +1,9 @@
 # CS348-S22-Group1
 
 
-bash>source projv/bin/activate
+bash>source projv/bin/activate 
+
+or bash>pip install -r requirements.txt
 
 
 bash>python3 test.py
