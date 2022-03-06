@@ -8,4 +8,4 @@ bash>python3 test.py
 
 
 
-copy paste webhost link from the terminal into web browser. 
+copy paste webhost link ie. http:// ###.#.#.#:####/ from the terminal into web browser. 
