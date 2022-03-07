@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang = "en">
+   <head></head>
+   <body>
+      
+      <h3>
+         <a href = "{{ url_for('show_all') }}">Purdue - Library 
+            Management System</a>
+      </h3>
+      
+      <hr/>
+      {%- for message in get_flashed_messages() %}
+         {{ message }}
+      {%- endfor %}
+		
+      <h3>Books (<a href = "{{ url_for('new') }}">Add Book
+         </a>)</h3>
+      
+      <h3>Books (<a href = "{{ url_for('search') }}">Search Book
+         </a>)</h3>
+      
+      <table>
+         <thead>
+            <tr>
+               <th>ISBN</th>
+               <th>Title</th>
+               <th>Author</th>
+            </tr>
+         </thead>
+         
+         <tbody>
+            {% for book in books %}
+               <tr>
+                  <td>{{ book.isbn }}</td>
+                  <td>{{ book.title }}</td>
+                  <td>{{ book.author }}</td>
+               </tr>
+            {% endfor %}
+         </tbody>
+      </table>
+      
+   </body>
+</html>
