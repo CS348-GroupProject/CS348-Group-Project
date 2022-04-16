@@ -27,7 +27,7 @@ class books(db.Model):
                 flash('Please enter all the fields', 'error')
             else:
                 book = books(request.form['isbn'], request.form['title'], request.form['author'])
-                #db.session.delete(books.query.get_or_404(1234567))
+                #db.session.delete(books.query.get_or_404(1234567))  USE THIS STATEMENT TO DELETE ANY DUMMY BOOK DATA
                 db.session.add(book)
                 db.session.commit()
                 flash('Book was successfully added!')
@@ -37,8 +37,6 @@ class books(db.Model):
     @app.route('/search', methods = ['GET', 'POST'])
     def search():
         if request.method == 'POST':
-            #book = books.query.get_or_404(request.form['search'])
-            #db.session.delete(books.query.get_or_404(1234567))
             flash('Book was successfully found!')
             return render_template('search.html', sTitle = books.query.get_or_404(request.form['search']).title, sAuthor = books.query.get_or_404(request.form['search']).author)
         return render_template('search.html')
