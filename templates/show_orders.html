@@ -7,52 +7,44 @@
          thead {background-color:black;color: gold; text-align: left;}
          tr {background-color:wheat; text-align: left;}
          td {padding: 12px 15px; background-color: wheat;}
-
+         body{font-size: large;}
       </style>
    </head>
    <body>
       
-      <h3>
-         <a href = "{{ url_for('show_all') }}">Purdue - Library 
-            Management System</a>
-      </h3>
-      
-      <hr/>
-      {%- for message in get_flashed_messages() %}
-         {{ message }}
-      {%- endfor %}
-		
-      <h3>Books (<a href = "{{ url_for('new') }}">Add Book
-         </a>)</h3>
-      
-      <h3>Books (<a href = "{{ url_for('search') }}">Search Book
-         </a>)</h3>
+    <h3>
+        <a href = "{{ url_for('show_all') }}">Purdue - Library 
+           Management System</a>
+     </h3> <br>
 
-      <h3>Ordered Books (<a href = "{{ url_for('show_orders') }}"> Show Ordered Books
-         </a>)</h3>
-      
-      <h3>Ordered Books (<a href = "{{ url_for('create_order') }}"> Order a Book
-         </a>)</h3>
+     <h3> Show Ordered Books</h3>
 
-      <table>
+      <table class="styled-table">
          <thead>
             <tr>
                <th>ISBN</th>
                <th>Title</th>
                <th>Author</th>
+               <th>Quantity</th>
+               <th>Order Date</th>
+               <th>ETA</th> 
             </tr>
          </thead>
          
          <tbody>
-            {% for book in books %}
+            {% for book in ordered_books %}
                <tr>
                   <td>{{ book.isbn }}</td>
-                  <td>{{ book.title }}</td>
-                  <td>{{ book.author }}</td>
+                  <td>{{ book.title}}</td>
+                  <td>{{ book.author}}</td>
+                  <td>{{ book.quantity}}</td>
+                  <td>{{ book.order_date}}</td>
+                  <td>{{ book.eta}}</td>
                </tr>
             {% endfor %}
          </tbody>
       </table>
       
    </body>
+
 </html>
