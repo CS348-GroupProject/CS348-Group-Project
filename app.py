@@ -18,7 +18,7 @@ class books(db.Model):
 
     @app.route('/')
     def show_all():
-        return render_template('show_all.html', books = books.query.all() )
+        return render_template('show_all.html', books = books.query.all())
 
     @app.route('/new', methods = ['GET', 'POST'])
     def new():
@@ -38,7 +38,11 @@ class books(db.Model):
     def search():
         if request.method == 'POST':
             flash('Book was successfully found!')
-            return render_template('search.html', sTitle = books.query.get_or_404(request.form['search']).title, sAuthor = books.query.get_or_404(request.form['search']).author)
+            result = db.session.execute('SELECT title, author FROM books WHERE isbn = :inputISBN', {'inputISBN' : request.form['search']})
+            bookFound = ""
+            for x in result:
+                bookFound = x
+            return render_template('search.html', returnBook = bookFound)
         return render_template('search.html')
 if __name__ == '__main__':
    db.create_all()
