@@ -40,6 +40,50 @@ class books(db.Model):
             flash('Book was successfully found!')
             return render_template('search.html', sTitle = books.query.get_or_404(request.form['search']).title, sAuthor = books.query.get_or_404(request.form['search']).author)
         return render_template('search.html')
+
+# Ordered Books Model & Functionality
+from datetime import datetime
+class ordered_books(db.Model):
+
+    # isbn is primary key
+    isbn = db.Column(db.String(200), primary_key=True, nullable=False)
+    title = db.Column(db.String(200), nullable=False)
+    author = db.Column(db.String(100), nullable=False)
+    quantity = db.Column(db.Integer, nullable=False)
+    order_date = db.Column(db.DateTime, nullable=False)
+    eta = db.Column(db.DateTime, nullable=False)
+    received = db.Column(db.Boolean, nullable=False)
+
+    # constructor
+    def __init__(self, isbn, title, author, quantity, order_date, eta, received):
+        self.isbn = isbn
+        self.title = title
+        self.author = author
+        self.quantity = quantity
+        self.order_date = order_date
+        self.eta = eta
+        self.received = received
+    
+    # query all ordered books
+    @app.route('/show_orders', methods = ['GET', 'POST'])
+    def show_orders():
+        return render_template('show_orders.html')
+    
+    # adding an order
+    @app.route('/create_order', methods = ['GET', 'POST'])
+    def create_order():
+        if request.method == 'POST':
+            if not request.form['isbn'] or not request.form['title'] or not request.form['author'] or not request.form['quantity'] or not request.form['order_date'] or not request.form['ETA']:
+                flash('Cannot add order. Please enter all required fields.', 'error')
+            else:
+                ordered_book = ordered_books(request.form['isbn'], request.form['title'], request.form['author'], int(request.form['quantity']), datetime.strptime(request.form['order_date'], '%m/%d/%Y'), datetime.strptime(request.form['ETA'], '%m/%d/%Y'), False)
+                db.session.add(ordered_book)
+                db.session.commit()
+                flash('Book order was submitted successfully.')
+                return redirect(url_for('show_orders'))
+        return render_template('create_order.html')
+    
+
 if __name__ == '__main__':
    db.create_all()
    app.run(debug = True)

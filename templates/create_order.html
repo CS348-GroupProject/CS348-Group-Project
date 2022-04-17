@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+   <body>
+   
+      <h3>Purdue - Place an Order to Library Database</h3>
+      <hr/>
+      
+      {%- for category, message in get_flashed_messages(with_categories = true) %}
+         <div class = "alert alert-danger">
+            {{ message }}
+         </div>
+      {%- endfor %}
+      
+      <form action = "{{ request.path }}" method = "post">
+         <label for = "name">ISBN</label><br>
+         <input type = "text" name = "isbn" placeholder = "Enter ISBN" /><br>
+        
+         <label for = "title">Title</label><br>
+         <input type = "text" name = "title" placeholder = "Enter book title" /><br>
+         
+         <label for = "author">Author</label><br>
+         <input type = "text" name = "author" placeholder = "Enter author name" /><br>
+         
+         <label for = "quantity">Quantity</label><br>
+         <input type = "text" name = "quantity" placeholder = "Enter quantity" /><br>
+         
+         <label for = "order_date">Order Date</label><br>
+         <input type = "text" name = "order_date" placeholder = "Enter date ordered" /><br>
+         
+         <label for = "ETA">ETA</label><br>
+         <input type = "text" name = "ETA" placeholder = "Enter Estimated Time of Arrival (ETA)" /><br>
+         
+         <input type = "submit" value = "Place Order" />
+      </form>
+      
+   </body>
+</html>
