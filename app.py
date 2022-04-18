@@ -103,7 +103,7 @@ class new_profiles(db.Model):
 
     @app.route('/show_users', methods = ['GET', 'POST'])
     def show_users():
-        return render_template('show_users.html')
+        return render_template('show_users.html', new_profiles = new_profiles.query.all())
 
     @app.route('/create_users', methods = ['GET', 'POST'])
     def create_users():
