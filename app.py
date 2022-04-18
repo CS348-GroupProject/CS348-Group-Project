@@ -118,7 +118,9 @@ class new_profiles(db.Model):
                 return redirect(url_for('show_users'))
         return render_template('create_users.html')
 
-
+@app.before_first_request
+def create_tables():
+    db.create_all()
 
 if __name__ == '__main__':
    db.create_all()
