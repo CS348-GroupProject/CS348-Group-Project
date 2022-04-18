@@ -106,7 +106,7 @@ class new_profiles(db.Model):
         return render_template('show_users.html')
 
     @app.route('/create_users', methods = ['GET', 'POST'])
-    def create_user():
+    def create_users():
         if request.method == 'POST':
             if not request.form['user_id'] or not request.form['first_name'] or not request.form['last_name'] or not request.form['address']:
                 flash('Please enter all required fields.', 'error')
