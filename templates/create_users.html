@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+   <body>
+   
+      <h3>Purdue - Place an Order to Library Database</h3>
+      <hr/>
+      
+      {%- for category, message in get_flashed_messages(with_categories = true) %}
+         <div class = "alert alert-danger">
+            {{ message }}
+         </div>
+      {%- endfor %}
+      
+      <form action = "{{ request.path }}" method = "post">
+         <label for = "user_id">User ID</label><br>
+         <input type = "text" name = "user_id" placeholder = "Enter User ID" /><br>
+        
+         <label for = "first_name">First Name</label><br>
+         <input type = "text" name = "first_name" placeholder = "Enter First Name" /><br>
+         
+         <label for = "last_name">Last Name</label><br>
+         <input type = "text" name = "last_name" placeholder = "Enter Last Name" /><br>
+         
+         <label for = "address">Address</label><br>
+         <input type = "text" name = "address" placeholder = "Enter Address" /><br>
+         
+         <input type = "submit" value = "Enter New Profile" />
+      </form>
+      
+   </body>
+</html>
