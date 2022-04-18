@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang = "en">
+   <head>
+      <style>
+         table {border-collapse: collapse; margin: 25px 0;font-size: large;font-family: sans-serif;min-width: 400px;box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);}
+         th {padding: 12px 15px; background-color: black;}
+         thead {background-color:black;color: gold; text-align: left;}
+         tr {background-color:wheat; text-align: left;}
+         td {padding: 12px 15px; background-color: wheat;}
+         body{font-size: large;}
+      </style>
+   </head>
+   <body>
+      
+    <h3>
+        <a href = "{{ url_for('show_all') }}">Purdue - Library 
+           Management System</a>
+     </h3> <br>
+
+     <h3> Show Profiles</h3>
+
+      <table class="styled-table">
+         <thead>
+            <tr>
+               <th>User ID</th>
+               <th>First Name</th>
+               <th>Last Name</th>
+               <th>Address</th>
+            </tr>
+         </thead>
+         
+         <tbody>
+            {% for prof in new_profiles %}
+               <tr>
+                  <td>{{ prof.user_id }}</td>
+                  <td>{{ prof.first_name }}</td>
+                  <td>{{ prof.last_name }}</td>
+                  <td>{{ prof.address }}</td>
+               </tr>
+            {% endfor %}
+         </tbody>
+      </table>
+      
+   </body>
+
+</html>

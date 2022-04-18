@@ -87,6 +87,38 @@ class ordered_books(db.Model):
                 return redirect(url_for('show_orders'))
         return render_template('create_order.html')
     
+# create and view new profiles
+class new_profiles(db.Model):
+    user_id = db.Column(db.String(200), primary_key=True, nullable=False)
+    first_name = db.Column(db.String(200), nullable=False)
+    last_name = db.Column(db.String(200), nullable=False)
+    address = db.Column(db.String(500), nullable=False)
+
+    # constructor
+    def __init__(self, user_id, first_name, last_name, address):
+        self.user_id = user_id
+        self.first_name = first_name
+        self.last_name = last_name
+        self.address = address
+
+    @app.route('/show_users', methods = ['GET', 'POST'])
+    def show_users():
+        return render_template('show_users.html')
+
+    @app.route('/create_users', methods = ['GET', 'POST'])
+    def create_user():
+        if request.method == 'POST':
+            if not request.form['user_id'] or not request.form['first_name'] or not request.form['last_name'] or not request.form['address']:
+                flash('Please enter all required fields.', 'error')
+            else:
+                entered_user = new_profiles(request.form['user_id'], request.form['first_name'], request.form['last_name'], request.form['address'])
+                db.session.add(entered_user)
+                db.session.commit()
+                flash('New profile was added successfully!')
+                return redirect(url_for('show_users'))
+        return render_template('create_users.html')
+
+
 
 if __name__ == '__main__':
    db.create_all()
