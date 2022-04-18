@@ -86,6 +86,13 @@ class ordered_books(db.Model):
                 flash('Book order was submitted successfully.')
                 return redirect(url_for('show_orders'))
         return render_template('create_order.html')
+
+    @app.route('/waitlist', methods = ['GET', 'POST'])
+    def waitlist():
+        if request.method == 'POST':
+            flash('Added to Waitlist!')
+            db.session.execute('INSERT INTO Wailists VALUES (:inputISBN, :inputMemberId)', {'inputISBN' : request.form['isbn'], 'inputMemberID': request.form['memberID']})
+        return render_template('search.html')
     
 
 if __name__ == '__main__':

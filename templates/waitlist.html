@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang = "en">
+   <head>
+      <style>
+         table {border-collapse: collapse; margin: 25px 0;font-size: large;font-family: sans-serif;min-width: 400px;box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);}
+         th {padding: 12px 15px; background-color: black;}
+         thead {background-color:black;color: gold; text-align: left;}
+         tr {background-color:wheat; text-align: left;}
+         td {padding: 12px 15px; background-color: wheat;}
+
+      </style>
+   </head>
+   <body>
+      
+    <h3>
+        <a href = "{{ url_for('show_all') }}">Purdue - Library 
+           Management System</a>
+    </h3>
+    <hr/>
+
+    <h3> Waitlist a Book </h3>
+
+    <form action = "{{ request.path }}" method = "post">
+         <label for = "name">Request for Wailist</label><br>
+         <input type = "text" name = "isbn" placeholder = "Input ISBN" /><br>
+         <input type = "text" name = "memberId" placeholder = "Input Membership ID" /><br>
+         <input type = "submit" value = "Submit" />
+    </form>
+  </body>
+</html> 
