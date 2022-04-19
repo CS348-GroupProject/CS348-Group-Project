@@ -51,11 +51,36 @@ class library(db.Model):
     def search():
         if request.method == 'POST':
             flash('Book was successfully found!')
-            result = db.session.execute('SELECT * FROM library WHERE isbn = :inputISBN', {'inputISBN' : request.form['search']})
-            bookFound = []
-            for x in result:
-                bookFound.append(tuple(x))
-            return render_template('search.html', searchedBooks = bookFound)
+            if request.form['filter'] == 'ISBN':
+                result = db.session.execute('SELECT * FROM library WHERE isbn = :inputISBN', {'inputISBN' : request.form['search']})
+                bookFound = []
+                for x in result:
+                    bookFound.append(tuple(x))
+                return render_template('search.html', searchedBooks = bookFound)
+            elif request.form['filter'] == 'title':
+                result = db.session.execute('SELECT * FROM library WHERE lower(title) = :inputTitle', {'inputTitle' : request.form['search'].lower()})
+                bookFound = []
+                for x in result:
+                    bookFound.append(tuple(x))
+                return render_template('search.html', searchedBooks = bookFound)
+            elif request.form['filter'] == 'author':
+                result = db.session.execute('SELECT * FROM library WHERE lower(author) = :inputAuthor', {'inputAuthor' : request.form['search'].lower()})
+                bookFound = []
+                for x in result:
+                    bookFound.append(tuple(x))
+                return render_template('search.html', searchedBooks = bookFound)
+            elif request.form['filter'] == 'genre':
+                result = db.session.execute('SELECT * FROM library WHERE lower(genre) = :inputGenre', {'inputGenre' : request.form['search'].lower()})
+                bookFound = []
+                for x in result:
+                    bookFound.append(tuple(x))
+                return render_template('search.html', searchedBooks = bookFound)
+            elif request.form['filter'] == 'publisher':
+                result = db.session.execute('SELECT * FROM library WHERE lower(publisher) = :inputPublisher', {'inputPublisher' : request.form['search'].lower()})
+                bookFound = []
+                for x in result:
+                    bookFound.append(tuple(x))
+                return render_template('search.html', searchedBooks = bookFound)
         return render_template('search.html')
 
 # Ordered Books Model & Functionality
