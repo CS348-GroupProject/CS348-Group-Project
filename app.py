@@ -38,11 +38,11 @@ class books(db.Model):
     def search():
         if request.method == 'POST':
             flash('Book was successfully found!')
-            result = db.session.execute('SELECT title, author FROM books WHERE isbn = :inputISBN', {'inputISBN' : request.form['search']})
-            bookFound = ""
+            result = db.session.execute('SELECT * FROM books WHERE isbn = :inputISBN', {'inputISBN' : request.form['search']})
+            bookFound = []
             for x in result:
-                bookFound = x
-            return render_template('search.html', returnBook = bookFound)
+                bookFound.append(tuple(x))
+            return render_template('search.html', searchedBooks = bookFound)
         return render_template('search.html')
 
 # Ordered Books Model & Functionality

@@ -1,5 +1,15 @@
 <!DOCTYPE html>
 <html>
+   <head>
+      <style>
+         table {border-collapse: collapse; margin: 25px 0;font-size: large;font-family: sans-serif;min-width: 400px;box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);}
+         th {padding: 12px 15px; background-color: black;}
+         thead {background-color:black;color: gold; text-align: left;}
+         tr {background-color:wheat; text-align: left;}
+         td {padding: 12px 15px; background-color: wheat;}
+         body{font-size: large;}
+      </style>
+   </head>
    <body>
    
       <h3>Purdue - Search Library Database</h3>
@@ -16,6 +26,27 @@
          <input type = "text" name = "search" placeholder = "search database" /><br>
          <input type = "submit" value = "Submit" />
       </form>
-        <p> {{ returnBook }} </p>
+
+        <h3> Books Found </h3>
+
+      <table class="styled-table">
+         <thead>
+            <tr>
+               <th>ISBN</th>
+               <th>Title</th>
+               <th>Author</th>
+            </tr>
+         </thead>
+         
+         <tbody>
+            {% for book in searchedBooks %}
+               <tr>
+                  <td>{{ book[0] }}</td>
+                  <td>{{ book[1] }}</td>
+                  <td>{{ book[2] }}</td>
+               </tr>
+            {% endfor %}
+         </tbody>
+      </table>
    </body>
 </html>
