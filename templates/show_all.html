@@ -48,15 +48,25 @@
                <th>ISBN</th>
                <th>Title</th>
                <th>Author</th>
+               <th>Genre</th>
+               <th>Publisher Date</th>
+               <th>Publisher</th>
+               <th>Total Quantity</th>
+               <th>Available Quantity</th>
             </tr>
          </thead>
          
          <tbody>
-            {% for book in books %}
+            {% for book in library_books %}
                <tr>
                   <td>{{ book.isbn }}</td>
                   <td>{{ book.title }}</td>
                   <td>{{ book.author }}</td>
+                  <td>{{ book.genre }}</td>
+                  <td>{{ book.pub_date }}</td>
+                  <td>{{ book.publisher }}</td>
+                  <td>{{ book.total_quantity }}</td>
+                  <td>{{ book.available_quantity }}</td>
                </tr>
             {% endfor %}
          </tbody>
