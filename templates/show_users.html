@@ -25,7 +25,12 @@
                <th>User ID</th>
                <th>First Name</th>
                <th>Last Name</th>
+               <th>Email Address</th>
                <th>Address</th>
+               <th>Phone Number</th>
+               <th>Late Fee</th>
+               <th>On Waitlist</th>
+
             </tr>
          </thead>
          
@@ -35,7 +40,13 @@
                   <td>{{ prof.user_id }}</td>
                   <td>{{ prof.first_name }}</td>
                   <td>{{ prof.last_name }}</td>
+                  <td>{{ prof.email_add }}</td>
                   <td>{{ prof.address }}</td>
+                  <td>{{ prof.phone_no }}</td>
+                  <td>{{ prof.late_fee }}</td>
+                  <td>{{ prof.on_waitlist }}</td>
+
+
                </tr>
             {% endfor %}
          </tbody>
