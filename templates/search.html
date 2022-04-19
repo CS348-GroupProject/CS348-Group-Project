@@ -23,7 +23,23 @@
 
     <form action = "{{ request.path }}" method = "post">
          <label for = "name">Search Library</label><br>
-         <input type = "text" name = "search" placeholder = "search database" /><br>
+
+         <input type="radio" id="isbn" name="filter" value="ISBN" checked> 
+         <label for="isn">ISBN</label><br>
+
+         <input type="radio" id="title" name="filter" value="title"> 
+         <label for="title">Title</label><br>
+
+         <input type="radio" id="author" name="filter" value="author"> 
+         <label for="author">Author</label><br>
+
+         <input type="radio" id="genre" name="filter" value="genre"> 
+         <label for="genre">Genre</label><br>
+
+         <input type="radio" id="publisher" name="filter" value="publisher"> 
+         <label for="publisher">Publisher</label><br>
+
+         <input type = "text" name = "search" placeholder = "Search for Book Here!" /><br>
          <input type = "submit" value = "Submit" />
       </form>
 
