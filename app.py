@@ -1,36 +1,49 @@
 from flask import Flask, request, flash, url_for, redirect, render_template
 from flask_sqlalchemy import SQLAlchemy
+import flask_sqlalchemy
+
 
 app = Flask(__name__, template_folder='templates')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mydata.db'
 app.secret_key = "secert_key"
 db = SQLAlchemy(app)
 
-class books(db.Model):
-    isbn = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(100))
-    author = db.Column(db.String(100))
+from datetime import datetime
+import sys
+class library(db.Model):
+    isbn = db.Column(db.Integer, primary_key=True, nullable=False)
+    title = db.Column(db.String(200), nullable=False)
+    author = db.Column(db.String(200), nullable=False)
+    genre = db.Column(db.String(200), nullable=False)
+    pub_date = db.Column(db.DateTime, nullable=False)
+    publisher = db.Column(db.String(200), nullable=False)
+    total_quantity = db.Column(db.Integer, nullable=False)
+    available_quantity = db.Column(db.Integer, nullable=False)
 
-    def __init__(self, isbn, title, author):
+    def __init__(self, isbn, title, author, genre, pub_date, publisher, total_quantity, available_quantity):
         self.isbn = isbn
         self.title = title
         self.author = author
+        self.genre = genre
+        self.pub_date = pub_date
+        self.publisher = publisher
+        self.total_quantity = total_quantity
+        self.available_quantity = available_quantity
 
     @app.route('/')
     def show_all():
-        return render_template('show_all.html', books = books.query.all())
+        return render_template('show_all.html', library_books = library.query.all())
 
     @app.route('/new', methods = ['GET', 'POST'])
     def new():
         if request.method == 'POST':
-            if not request.form['isbn'] or not request.form['title'] or not request.form['author']:
+            if not request.form['isbn'] or not request.form['title'] or not request.form['author'] or not request.form['genre'] or not request.form['pub_date'] or not request.form['publisher'] or not request.form['total_quantity'] or not request.form['avail_quantity']:
                 flash('Please enter all the fields', 'error')
             else:
-                book = books(request.form['isbn'], request.form['title'], request.form['author'])
-                #db.session.delete(books.query.get_or_404(1234567))  USE THIS STATEMENT TO DELETE ANY DUMMY BOOK DATA
-                db.session.add(book)
+                new_book = library(int(request.form['isbn']), request.form['title'], request.form['author'], request.form['genre'], datetime.strptime(request.form['pub_date'], '%m/%d/%Y'), request.form['publisher'], int(request.form['total_quantity']), int(request.form['avail_quantity']))
+                db.session.add(new_book)
                 db.session.commit()
-                flash('Book was successfully added!')
+                flash('Book was successfully added to the Library!')
                 return redirect(url_for('show_all'))
         return render_template('new.html')
 
@@ -38,7 +51,7 @@ class books(db.Model):
     def search():
         if request.method == 'POST':
             flash('Book was successfully found!')
-            result = db.session.execute('SELECT * FROM books WHERE isbn = :inputISBN', {'inputISBN' : request.form['search']})
+            result = db.session.execute('SELECT * FROM library WHERE isbn = :inputISBN', {'inputISBN' : request.form['search']})
             bookFound = []
             for x in result:
                 bookFound.append(tuple(x))
