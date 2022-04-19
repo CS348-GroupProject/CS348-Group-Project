@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+           table {border-collapse: collapse; margin: 25px 0;font-size: large;font-family: sans-serif;min-width: 400px;box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);}
+           th {padding: 12px 15px; background-color: black;}
+           thead {background-color:black;color: gold; text-align: left;}
+           tr {background-color:wheat; text-align: left;}
+           td {padding: 12px 15px; background-color: wheat;}
+           body{font-size: large;}
+        </style>
+     </head>
+   <body>
+   
+      <h3>Purdue - Search Book Orders</h3>
+      <hr/>
+      
+      {%- for category, message in get_flashed_messages(with_categories = true) %}
+         <div class = "alert alert-danger">
+            {{ message }}
+         </div>
+      {%- endfor %}
+
+      <form action="{{request.path}}", method="post">
+        <label for="filters">Choose a filter:</label>
+        <select id="filters" name="filters" size="5">
+          <option value="author">Author Name</option>
+          <option value="title">Book title</option>
+          <option value="not received">Not Received Books</option>
+          <option value="received">Received Books</option>
+          <option value="isbn">ISBN Code</option>
+        </select><br><br>
+        <input type="text", name="search", placeholder="Enter Search"/><br>
+        <input type="submit" value="submit">
+      </form>
+
+      <table class="styled-table">
+        <thead>
+           <tr>
+              <th>ISBN</th>
+              <th>Title</th>
+              <th>Author</th>
+              <th>Quantity</th>
+              <th>Order Date</th>
+              <th>ETA</th>
+              <th>Received</th> 
+ 
+           </tr>
+        </thead>
+        
+        <tbody>
+           {% for book in returnOrderedBook %}
+              <tr>
+                 <td>{{ book.isbn }}</td>
+                 <td>{{ book.title}}</td>
+                 <td>{{ book.author}}</td>
+                 <td>{{ book.quantity}}</td>
+                 <td>{{ book.order_date}}</td>
+                 <td>{{ book.eta}}</td>
+                 <td>{{ book.received}}</td>
+              </tr>
+           {% endfor %}
+        </tbody>
+     </table>
+
+      
+   </body>
+</html>

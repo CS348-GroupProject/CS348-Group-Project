@@ -71,7 +71,30 @@ class ordered_books(db.Model):
     # query all ordered books
     @app.route('/show_orders', methods = ['GET', 'POST'])
     def show_orders():
-        return render_template('show_orders.html')
+        return render_template('show_orders.html', ordered_books = ordered_books.query.all())
+    
+    # filter for ordered books
+    @app.route('/filter_orders', methods = ['GET', 'POST'])
+    def filter_orders():
+        if request.method == 'POST':
+            res = request.form['filters']
+            if res == 'isbn':
+                flash('Book was successfully found!')
+                result = db.session.execute('SELECT * FROM ordered_books WHERE isbn = :inputISBN', {'inputISBN' : request.form['search']})
+            elif res == 'author':
+                flash('Book was successfully found!')
+                result = db.session.execute('SELECT * FROM ordered_books WHERE author = :inputAuthor', {'inputAuthor' : request.form['search']})
+            elif res == 'title':
+                flash('Book was successfully found!')
+                result = db.session.execute('SELECT * FROM ordered_books WHERE title = :inputTitle', {'inputTitle' : request.form['search']})
+            elif res == 'not received':
+                result = db.session.execute('SELECT * FROM ordered_books WHERE received = False')
+            elif res == 'received':
+                flash('Book is sucessfully found')
+                result = db.session.execute('SELECT * FROM ordered_books WHERE received = True')
+            return render_template('filter_orders.html', returnOrderedBook = result)
+
+        return render_template('filter_orders.html')
     
     # adding an order
     @app.route('/create_order', methods = ['GET', 'POST'])
@@ -85,7 +108,7 @@ class ordered_books(db.Model):
                 db.session.commit()
                 flash('Book order was submitted successfully.')
                 return redirect(url_for('show_orders'))
-        return render_template('create_order.html')
+        return render_template('create_order.html')  
     
 # create and view new profiles
 class new_profiles(db.Model):
