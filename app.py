@@ -8,8 +8,9 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mydata.db'
 app.secret_key = "secert_key"
 db = SQLAlchemy(app)
 
+
+# Library Model & Functionality
 from datetime import datetime
-import sys
 class library(db.Model):
     isbn = db.Column(db.Integer, primary_key=True, nullable=False)
     title = db.Column(db.String(200), nullable=False)
@@ -83,6 +84,31 @@ class library(db.Model):
                 return render_template('search.html', searchedBooks = bookFound)
         return render_template('search.html')
 
+
+# Books Model & Functionality
+class books(db.Model):
+    book_id = db.Column(db.Integer, primary_key=True, nullable=False)
+    checked_status = db.Column(db.Boolean, nullable=False)
+    donated_status = db.Column(db.Boolean, nullable=False)
+
+    def __init__(self, book_id, isbn, donated_status):
+        self.book_id = book_id
+        self.isbn = isbn
+        self.donated_status = donated_status
+
+
+# Checkout Model & Functionality
+class checked_out(db.Model):
+    book_id = db.Column(db.Integer, primary_key=True, nullable=False)
+    date_issued = db.Column(db.DateTime, nullable=False)
+    date_due = db.Column(db.DateTime, nullable=False)
+
+    def __init__(self, book_id, date_issued, date_due):
+        self.book_id = book_id
+        self.date_issued = date_issued
+        self.date_due = date_due
+
+
 # Ordered Books Model & Functionality
 from datetime import datetime
 class ordered_books(db.Model):
@@ -148,7 +174,7 @@ class ordered_books(db.Model):
                 return redirect(url_for('show_orders'))
         return render_template('create_order.html')  
     
-# create and view new profiles
+# Memberships Model & Functionality
 class new_profiles(db.Model):
     user_id = db.Column(db.String(200), primary_key=True, nullable=False)
     first_name = db.Column(db.String(200), nullable=False)
