@@ -1,10 +1,4 @@
-<<<<<<< Updated upstream
 from flask import Flask
-=======
-from lib2to3.pgen2.pgen import generate_grammar
-from multiprocessing import AuthenticationError
-from flask import Flask, request, flash, url_for, redirect, render_template
->>>>>>> Stashed changes
 from flask_sqlalchemy import SQLAlchemy
 from matplotlib.pyplot import title
 from matplotlib.style import available
@@ -13,9 +7,6 @@ from sqlalchemy import true
 app = Flask(__name__, template_folder='templates')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mydata.db'
 app.secret_key = "secert_key"
-<<<<<<< Updated upstream
-db = SQLAlchemy(app)
-=======
 db = SQLAlchemy(app)
 id = 0
 
@@ -171,4 +162,3 @@ class checked_out_books(db.model):
 if __name__ == '__main__':
    db.create_all()
    app.run(debug = True)
->>>>>>> Stashed changes
