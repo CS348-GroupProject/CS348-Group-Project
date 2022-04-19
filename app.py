@@ -19,7 +19,7 @@ class library(db.Model):
     pub_date = db.Column(db.DateTime, nullable=False)
     publisher = db.Column(db.String(200), nullable=False)
     total_quantity = db.Column(db.Integer, nullable=False)
-    available_quantity = db.Column(db.Integer, nullable=False)
+    available_quantity = db.Column(db.Integer, nullable=True)
 
     def __init__(self, isbn, title, author, genre, pub_date, publisher, total_quantity, available_quantity):
         self.isbn = isbn
