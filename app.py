@@ -1,3 +1,4 @@
+# from crypt import methods
 from flask import Flask, request, flash, url_for, redirect, render_template
 from flask_sqlalchemy import SQLAlchemy
 import flask_sqlalchemy
@@ -151,11 +152,6 @@ class ordered_books(db.Model):
             elif res == 'title':
                 flash('Book was successfully found!')
                 result = db.session.execute('SELECT * FROM ordered_books WHERE title = :inputTitle', {'inputTitle' : request.form['search']})
-            elif res == 'not received':
-                result = db.session.execute('SELECT * FROM ordered_books WHERE received = False')
-            elif res == 'received':
-                flash('Book is sucessfully found')
-                result = db.session.execute('SELECT * FROM ordered_books WHERE received = True')
             return render_template('filter_orders.html', returnOrderedBook = result)
 
         return render_template('filter_orders.html')
@@ -174,6 +170,26 @@ class ordered_books(db.Model):
                 return redirect(url_for('show_orders'))
         return render_template('create_order.html')  
     
+    @app.route('/update_order_status', methods=['GET', 'POST'])
+    def update_order_status ():
+        if request.method == 'POST':
+            isbn_add = request.form['isbn']
+            res = db.session.execute('SELECT * FROM ordered_books WHERE isbn = :inputISBN', {'inputISBN' : isbn_add})
+            if res == None:
+                flash('Check ISBN value. The entered ISBN is not present in the orders table')
+            else:
+                # first update order to received status
+                db.session.execute('UPDATE ordered_books SET received = 1 WHERE isbn = :inputISBN', {'inputISBN' : isbn_add})
+                db.session.commit()
+                # next, if books ordered do not exist in the library, add them
+                in_library = db.session.execute('SELECT isbn FROM library WHERE isbn = :inputISBN', {'inputISBN' : isbn_add})
+                # if in_library == None:
+                #     db.session.execute('INSERT INTO library SELECT isbn, title, author, genre, pub_date, publisher, ')
+
+                return redirect(url_for('show_orders'))
+        return render_template('update_order_status.html')
+
+
 # Memberships Model & Functionality
 class new_profiles(db.Model):
     user_id = db.Column(db.String(200), primary_key=True, nullable=False)
