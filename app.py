@@ -1,16 +1,20 @@
-from flask import Flask
+from flask import Flask, request, flash, url_for, redirect, render_template
 from flask_sqlalchemy import SQLAlchemy
-from matplotlib.pyplot import title
-from matplotlib.style import available
-from sqlalchemy import true
+from datetime import datetime
+import flask_sqlalchemy
+
 
 app = Flask(__name__, template_folder='templates')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mydata.db'
 app.secret_key = "secert_key"
 db = SQLAlchemy(app)
-id = 0
 
-class library(db.model):
+user_num = 0
+book_num = 0
+
+# Library Model & Functionality
+from datetime import datetime
+class library(db.Model):
     isbn = db.Column(db.Integer, primary_key=True, nullable=False)
     title = db.Column(db.String(200), nullable=False)
     author = db.Column(db.String(200), nullable=False)
@@ -30,40 +34,24 @@ class library(db.model):
         self.total_quantity = total_quantity
         self.available_quantity = available_quantity
 
-        
-
-
-
-
-
-
-
-class books(db.Model):
-    book_id = db.Column(db.Integer, primary_key=True, nullable=False)
-    isbn = db.Column(db.Integer, nullable=False)
-    checked_status = db.Column(db.Boolean, nullable=False)
-
-    def __init__(self, book_id, isbn, checked_status):
-        self.book_id = book_id
-        self.isbn = isbn
-        self.checked_status = checked_status
-
     @app.route('/')
     def show_all():
-        return render_template('show_all.html', books = books.query.all())
+        return render_template('show_all.html', library_books = library.query.all())
+
 
     @app.route('/new', methods = ['GET', 'POST'])
     def new():
         if request.method == 'POST':
-            if not request.form['isbn'] or not request.form['title'] or not request.form['author']:
+            if not request.form['isbn'] or not request.form['title'] or not request.form['author'] or not request.form['genre'] or not request.form['pub_date'] or not request.form['publisher'] or not request.form['total_quantity'] or not request.form['avail_quantity']:
                 flash('Please enter all the fields', 'error')
             else:
-                book = books(id, request.form['isbn'], request.form['title'], request.form['author'])
-                id += 1
-                #db.session.delete(books.query.get_or_404(1234567))  USE THIS STATEMENT TO DELETE ANY DUMMY BOOK DATA
-                db.session.add(book)
+                new_book = library(int(request.form['isbn']), request.form['title'], request.form['author'], request.form['genre'], datetime.strptime(request.form['pub_date'], '%m/%d/%Y'), request.form['publisher'], int(request.form['total_quantity']), int(request.form['avail_quantity']))
+                acc_book = books(book_num, int(request.form['isbn']), False)
+                db.session.add(acc_book)
+                book_num += 1
+                db.session.add(new_book)
                 db.session.commit()
-                flash('Book was successfully added!')
+                flash('Book was successfully added to the Library!')
                 return redirect(url_for('show_all'))
         return render_template('new.html')
 
@@ -71,27 +59,113 @@ class books(db.Model):
     def search():
         if request.method == 'POST':
             flash('Book was successfully found!')
-            result = db.session.execute('SELECT book_id, title, author FROM books WHERE isbn = :inputISBN', {'inputISBN' : request.form['search']})
-            bookFound = ""
-            flag = True
-            for x in result:
-                if flag:
-                    bookFound += x
-                    flag = False
-                else:
-                    bookFound += '\n'
-                    bookFound += x
-            if (bookFound != ""):
-                flash('Book was successfully found!')
-            return render_template('search.html', returnBook = bookFound)
+            if request.form['filter'] == 'ISBN':
+                result = db.session.execute('SELECT * FROM library WHERE isbn = :inputISBN', {'inputISBN' : request.form['search']})
+                bookFound = []
+                for x in result:
+                    bookFound.append(tuple(x))
+                return render_template('search.html', searchedBooks = bookFound)
+            elif request.form['filter'] == 'title':
+                result = db.session.execute('SELECT * FROM library WHERE lower(title) = :inputTitle', {'inputTitle' : request.form['search'].lower()})
+                bookFound = []
+                for x in result:
+                    bookFound.append(tuple(x))
+                return render_template('search.html', searchedBooks = bookFound)
+            elif request.form['filter'] == 'author':
+                result = db.session.execute('SELECT * FROM library WHERE lower(author) = :inputAuthor', {'inputAuthor' : request.form['search'].lower()})
+                bookFound = []
+                for x in result:
+                    bookFound.append(tuple(x))
+                return render_template('search.html', searchedBooks = bookFound)
+            elif request.form['filter'] == 'genre':
+                result = db.session.execute('SELECT * FROM library WHERE lower(genre) = :inputGenre', {'inputGenre' : request.form['search'].lower()})
+                bookFound = []
+                for x in result:
+                    bookFound.append(tuple(x))
+                return render_template('search.html', searchedBooks = bookFound)
+            elif request.form['filter'] == 'publisher':
+                result = db.session.execute('SELECT * FROM library WHERE lower(publisher) = :inputPublisher', {'inputPublisher' : request.form['search'].lower()})
+                bookFound = []
+                for x in result:
+                    bookFound.append(tuple(x))
+                return render_template('search.html', searchedBooks = bookFound)
         return render_template('search.html')
 
+
+# Books Model & Functionality
+class books(db.Model):
+    book_id = db.Column(db.Integer, primary_key=True, nullable=False)
+    isbn = db.Column(db.String(200), nullable=False)
+    checked_status = db.Column(db.Boolean, nullable=False)
+
+    def __init__(self, book_id, isbn, checked_status):
+        self.book_id = book_id
+        self.isbn = isbn
+        self.checked_status = checked_status
+
+    @app.route('/show_books')
+    def show_books():
+        return render_template('show_books.html', books = books.query.all())
+
+    
+
+
+# Checkout Model & Functionality
+class book_checkout(db.Model):
+    isbn = db.Column(db.Integer, primary_key=True, nullable=False)
+    user_id = db.Column(db.Integer, nullable=False)
+    date_issued = db.Column(db.DateTime, nullable=False)
+    date_due = db.Column(db.DateTime, nullable=False)
+
+    #constructor
+    def __init__(self, isbn, user_id, date_issued, date_due):
+        self.isbn = isbn
+        self.user_id = user_id
+        self.date_issued = date_issued
+        self.date_due = date_due
+    
+    #show all checked 
+    @app.route('/show_checked', methods= ['GET', 'POST'])
+    def show_checked():
+        return render_template('show_checked.html', book_checkout= book_checkout.query.all())
+
+    @app.route('/checkout_book', methods= ['GET', 'POST'])
+    def checkout_book():
+        if request.method == 'POST':
+            if not request.form['isbn'] or not request.form['user_id'] or not request.form['date_issued'] or not request.form['date_due']:
+                flash('Cannot Check Out', 'error')
+            else:
+                check_book = book_checkout(int(request.form['isbn']), int(request.form['user_id']), datetime.strptime(request.form['date_issued'], '%m/%d/%Y'), datetime.strptime(request.form['date_due'], '%m/%d/%Y'))
+                db.session.add(check_book)
+                db.session.commit()
+                flash('Book Checkout was successfully.')
+                return redirect(url_for('show_checked'))
+        return render_template('checkout_book.html')
+    
+    @app.route('/return_book', methods=['GET', 'POST'])
+    def return_book():
+        if request.method == 'POST':
+            if not request.form['isbn'] or not request.form['user_id']:
+                flash('Cannot Return Book', 'error')
+            else:
+                found_book = book_checkout.query.filter_by(isbn=int(request.form['isbn']), user_id=int(request.form['user_id']))
+                db.session.delete(found_book)
+                db.session.commit()
+                flash('Book Return was successfully.')
+                return redirect(url_for('show_checked'))
+        return render_template('return_book.html')
+
+    
+
+
+
+
+
 # Ordered Books Model & Functionality
-from datetime import datetime
 class ordered_books(db.Model):
 
     # isbn is primary key
-    isbn = db.Column(db.Integer, primary_key=True, nullable=False)
+    isbn = db.Column(db.String(200), primary_key=True, nullable=False)
     title = db.Column(db.String(200), nullable=False)
     author = db.Column(db.String(100), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
@@ -112,7 +186,30 @@ class ordered_books(db.Model):
     # query all ordered books
     @app.route('/show_orders', methods = ['GET', 'POST'])
     def show_orders():
-        return render_template('show_orders.html')
+        return render_template('show_orders.html', ordered_books = ordered_books.query.all())
+    
+    # filter for ordered books
+    @app.route('/filter_orders', methods = ['GET', 'POST'])
+    def filter_orders():
+        if request.method == 'POST':
+            res = request.form['filters']
+            if res == 'isbn':
+                flash('Book was successfully found!')
+                result = db.session.execute('SELECT * FROM ordered_books WHERE isbn = :inputISBN', {'inputISBN' : request.form['search']})
+            elif res == 'author':
+                flash('Book was successfully found!')
+                result = db.session.execute('SELECT * FROM ordered_books WHERE author = :inputAuthor', {'inputAuthor' : request.form['search']})
+            elif res == 'title':
+                flash('Book was successfully found!')
+                result = db.session.execute('SELECT * FROM ordered_books WHERE title = :inputTitle', {'inputTitle' : request.form['search']})
+            elif res == 'not received':
+                result = db.session.execute('SELECT * FROM ordered_books WHERE received = False')
+            elif res == 'received':
+                flash('Book is successfully found')
+                result = db.session.execute('SELECT * FROM ordered_books WHERE received = True')
+            return render_template('filter_orders.html', returnOrderedBook = result)
+
+        return render_template('filter_orders.html')
     
     # adding an order
     @app.route('/create_order', methods = ['GET', 'POST'])
@@ -126,38 +223,44 @@ class ordered_books(db.Model):
                 db.session.commit()
                 flash('Book order was submitted successfully.')
                 return redirect(url_for('show_orders'))
-        return render_template('create_order.html')
-
-
-class checked_out_books(db.model):
-    member_ID = db.Column(db.Integer, nullable=False)
-    book_ID = db.Column(db.Integer, primary_key=True, nullable=False)
-    issued = db.Column(db.DateTime, nullable=False)
-    due = db.Column(db.DateTime, nullable=False)
-
-    def __init__(self, member_ID, book_ID, issued, due):
-        self.member_ID = member_ID
-        self.book_ID = book_ID
-        self.issued = issued
-        self.due = due
+        return render_template('create_order.html')  
     
-    @app.route('/show_checked', methods = ['GET', 'POST'])
-    def show_checked():
-        return render_template('show_checked.html')
-    
-    @app.route('/checkout_book', methods = ['GET', 'POST'])
-    def create_order():
+# Memberships Model & Functionality
+class new_profiles(db.Model):
+    user_id = db.Column(db.Integer, primary_key=True, nullable=False)
+    first_name = db.Column(db.String(200), nullable=False)
+    last_name = db.Column(db.String(200), nullable=False)
+    address = db.Column(db.String(500), nullable=False)
+
+    # constructor
+    def __init__(self, user_id, first_name, last_name, address):
+        self.user_id = user_id
+        self.first_name = first_name
+        self.last_name = last_name
+        self.address = address
+
+    @app.route('/show_users', methods = ['GET', 'POST'])
+    def show_users():
+        return render_template('show_users.html', new_profiles = new_profiles.query.all())
+
+    @app.route('/create_users', methods = ['GET', 'POST'])
+    def create_users():
         if request.method == 'POST':
-            if not request.form['member_ID'] or not request.form['book_ID'] or not request.form['issued'] or not request.form['due']:
-                flash('Cannot check out book. Please enter all required fields.', 'error')
+            if not request.form['first_name'] or not request.form['last_name'] or not request.form['address']:
+                flash('Please enter all required fields.', 'error')
             else:
-                checked_book = checked_out_books(int(request.form['member_ID']), int(request.form['book_ID']), datetime.strptime(request.form['issued'], '%m/%d/%Y'), datetime.strptime(request.form['due'], '%m/%d/%Y'), False)
-                db.session.add(checked_book)
+                global user_num
+                entered_user = new_profiles(user_num, request.form['first_name'], request.form['last_name'], request.form['address'])
+                user_num += 1
+                db.session.add(entered_user)
                 db.session.commit()
-                flash('Book Checked Out successfully.')
-                return redirect(url_for('show_checked'))
-        return render_template('checkout_book.html')
+                flash('New profile was added successfully!')
+                return redirect(url_for('show_users'))
+        return render_template('create_users.html')
 
+@app.before_first_request
+def create_tables():
+    db.create_all()
 
 if __name__ == '__main__':
    db.create_all()
