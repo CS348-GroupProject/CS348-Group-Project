@@ -17,39 +17,36 @@
            Management System</a>
      </h3> <br>
 
-     <h3> Ordered Books</h3>
-
-     <h3>
-      <a href = "{{ url_for('filter_orders') }}"> Search for Specific Orders</a>
-      </h3> <br>
-
-      <h3>
-         <a href = "{{ url_for('update_order_status') }}"> Log an Ordered Book Shipment</a>
-         </h3> <br>
+     <h3> Show Profiles</h3>
 
       <table class="styled-table">
          <thead>
             <tr>
-               <th>ISBN</th>
-               <th>Title</th>
-               <th>Author</th>
-               <th>Quantity</th>
-               <th>Order Date</th>
-               <th>ETA</th> 
-               <th> Received</th>
+               <th>User ID</th>
+               <th>First Name</th>
+               <th>Last Name</th>
+               <th>Email Address</th>
+               <th>Address</th>
+               <th>Phone Number</th>
+               <th>Late Fee</th>
+               <th>On Waitlist</th>
+
             </tr>
          </thead>
          
          <tbody>
-            {% for book in ordered_books %}
+            {% for prof in new_profiles %}
                <tr>
-                  <td>{{ book.isbn }}</td>
-                  <td>{{ book.title}}</td>
-                  <td>{{ book.author}}</td>
-                  <td>{{ book.quantity}}</td>
-                  <td>{{ book.order_date}}</td>
-                  <td>{{ book.eta}}</td>
-                  <td>{{ book.received}}</td>
+                  <td>{{ prof.user_id }}</td>
+                  <td>{{ prof.first_name }}</td>
+                  <td>{{ prof.last_name }}</td>
+                  <td>{{ prof.email_add }}</td>
+                  <td>{{ prof.address }}</td>
+                  <td>{{ prof.phone_no }}</td>
+                  <td>{{ prof.late_fee }}</td>
+                  <td>{{ prof.on_waitlist }}</td>
+
+
                </tr>
             {% endfor %}
          </tbody>
@@ -58,4 +55,3 @@
    </body>
 
 </html>
-

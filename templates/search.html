@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <style>
+         table {border-collapse: collapse; margin: 25px 0;font-size: large;font-family: sans-serif;min-width: 400px;box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);}
+         th {padding: 12px 15px; background-color: black;}
+         thead {background-color:black;color: gold; text-align: left;}
+         tr {background-color:wheat; text-align: left;}
+         td {padding: 12px 15px; background-color: wheat;}
+         body{font-size: large;}
+      </style>
+   </head>
+   <body>
+   
+      <h3>Purdue - Search Library Database</h3>
+      <hr/>
+      
+      {%- for category, message in get_flashed_messages(with_categories = true) %}
+         <div class = "alert alert-danger">
+            {{ message }}
+         </div>
+      {%- endfor %}
+
+    <form action = "{{ request.path }}" method = "post">
+         <label for = "name">Search Library</label><br>
+
+         <input type="radio" id="isbn" name="filter" value="ISBN" checked> 
+         <label for="isn">ISBN</label><br>
+
+         <input type="radio" id="title" name="filter" value="title"> 
+         <label for="title">Title</label><br>
+
+         <input type="radio" id="author" name="filter" value="author"> 
+         <label for="author">Author</label><br>
+
+         <input type="radio" id="genre" name="filter" value="genre"> 
+         <label for="genre">Genre</label><br>
+
+         <input type="radio" id="publisher" name="filter" value="publisher"> 
+         <label for="publisher">Publisher</label><br>
+
+         <input type = "text" name = "search" placeholder = "Search for Book Here!" /><br>
+         <input type = "submit" value = "Submit" />
+      </form>
+
+        <h3> Books Found </h3>
+
+      <table class="styled-table">
+         <thead>
+            <tr>
+               <th>ISBN</th>
+               <th>Title</th>
+               <th>Author</th>
+               <th>Genre</th>
+               <th>Publisher Date</th>
+               <th>Publisher</th>
+               <th>Total Quantity</th>
+               <th>Available Quantity</th>
+            </tr>
+         </thead>
+         
+         <tbody>
+            {% for book in searchedBooks %}
+               <tr>
+                  <td>{{ book[0] }}</td>
+                  <td>{{ book[1] }}</td>
+                  <td>{{ book[2] }}</td>
+                  <td>{{ book[3] }}</td>
+                  <td>{{ book[4] }}</td>
+                  <td>{{ book[5] }}</td>
+                  <td>{{ book[6] }}</td>
+                  <td>{{ book[7] }}</td>
+               </tr>
+            {% endfor %}
+         </tbody>
+      </table>
+   </body>
+</html>

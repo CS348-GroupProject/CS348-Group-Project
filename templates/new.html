@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+   <body>
+   
+      <h3>Purdue - Add Book to Library Database</h3>
+      <hr/>
+      
+      {%- for category, message in get_flashed_messages(with_categories = true) %}
+         <div class = "alert alert-danger">
+            {{ message }}
+         </div>
+      {%- endfor %}
+      
+      <form action = "{{ request.path }}" method = "post">
+         <label for = "name">ISBN</label><br>
+         <input type = "text" name = "isbn" placeholder = "Enter ISBN" /><br>
+        
+         <label for = "title">Title</label><br>
+         <input type = "text" name = "title" placeholder = "Enter book title" /><br>
+         
+         <label for = "author">Author</label><br>
+         <input type = "text" name = "author" placeholder = "Enter author name" /><br>
+         
+         <label for = "genre">Genre</label><br>
+         <input type = "text" name = "genre" placeholder = "Enter genre" /><br>
+         
+         <label for = "pub_date">Publisher Date</label><br>
+         <input type = "text" name = "pub_date" placeholder = "Enter publisher date" /><br>
+         
+         <label for = "publisher">Publisher</label><br>
+         <input type = "text" name = "publisher" placeholder = "Enter publisher" /><br>
+
+         <label for = "total_quantity">Total Quantity</label><br>
+         <input type = "text" name = "total_quantity" placeholder = "Enter total quantity" /><br>
+
+         <label for = "avail_quantity">Available Quantity</label><br>
+         <input type = "text" name = "avail_quantity" placeholder = "Enter available quantity" /><br>
+
+         <input type = "submit" value = "Submit" />
+      </form>
+      
+   </body>
+</html>

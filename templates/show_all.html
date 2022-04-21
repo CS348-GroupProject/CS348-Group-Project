@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang = "en">
+   <head>
+      <style>
+         table {border-collapse: collapse; margin: 25px 0;font-size: large;font-family: sans-serif;min-width: 400px;box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);}
+         th {padding: 12px 15px; background-color: black;}
+         thead {background-color:black;color: gold; text-align: left;}
+         tr {background-color:wheat; text-align: left;}
+         td {padding: 12px 15px; background-color: wheat;}
+
+      </style>
+   </head>
+   <body>
+      
+      <h3>
+         <a href = "{{ url_for('show_all') }}">Purdue - Library 
+            Management System</a>
+      </h3>
+      
+      <hr/>
+      {%- for message in get_flashed_messages() %}
+         {{ message }}
+      {%- endfor %}
+		
+      <h3>Books (<a href = "{{ url_for('new') }}">Add Book
+         </a>)</h3>
+      
+      <h3>Books (<a href = "{{ url_for('search') }}">Search Book
+         </a>)</h3>
+
+      <h3>Ordered Books (<a href = "{{ url_for('show_orders') }}"> Show Ordered Books
+         </a>)</h3>
+      
+      <h3>Ordered Books (<a href = "{{ url_for('create_order') }}"> Order a Book
+         </a>)</h3>
+
+      <h3> New User (<a href = "{{ url_for('create_users') }}"> Create a Profile
+      </a>)</h3>
+
+      <h3> New User (<a href = "{{ url_for('show_users') }}"> Show Profiles
+      </a>)</h3>
+
+
+
+      <table>
+         <thead>
+            <tr>
+               <th>ISBN</th>
+               <th>Title</th>
+               <th>Author</th>
+               <th>Genre</th>
+               <th>Publisher Date</th>
+               <th>Publisher</th>
+               <th>Total Quantity</th>
+               <th>Available Quantity</th>
+            </tr>
+         </thead>
+         
+         <tbody>
+            {% for book in library_books %}
+               <tr>
+                  <td>{{ book.isbn }}</td>
+                  <td>{{ book.title }}</td>
+                  <td>{{ book.author }}</td>
+                  <td>{{ book.genre }}</td>
+                  <td>{{ book.pub_date }}</td>
+                  <td>{{ book.publisher }}</td>
+                  <td>{{ book.total_quantity }}</td>
+                  <td>{{ book.available_quantity }}</td>
+               </tr>
+            {% endfor %}
+         </tbody>
+      </table>
+      
+   </body>
+</html>

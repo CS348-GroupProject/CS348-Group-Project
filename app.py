@@ -9,8 +9,10 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mydata.db'
 app.secret_key = "secert_key"
 db = SQLAlchemy(app)
 
+
 user_num = 0
 book_num = 0
+
 
 # Library Model & Functionality
 from datetime import datetime
@@ -22,7 +24,7 @@ class library(db.Model):
     pub_date = db.Column(db.DateTime, nullable=False)
     publisher = db.Column(db.String(200), nullable=False)
     total_quantity = db.Column(db.Integer, nullable=False)
-    available_quantity = db.Column(db.Integer, nullable=False)
+    available_quantity = db.Column(db.Integer, nullable=True)
 
     def __init__(self, isbn, title, author, genre, pub_date, publisher, total_quantity, available_quantity):
         self.isbn = isbn
@@ -38,7 +40,6 @@ class library(db.Model):
     def show_all():
         return render_template('show_all.html', library_books = library.query.all())
 
-
     @app.route('/new', methods = ['GET', 'POST'])
     def new():
         if request.method == 'POST':
@@ -46,9 +47,11 @@ class library(db.Model):
                 flash('Please enter all the fields', 'error')
             else:
                 new_book = library(int(request.form['isbn']), request.form['title'], request.form['author'], request.form['genre'], datetime.strptime(request.form['pub_date'], '%m/%d/%Y'), request.form['publisher'], int(request.form['total_quantity']), int(request.form['avail_quantity']))
+
                 acc_book = books(book_num, int(request.form['isbn']), False)
                 db.session.add(acc_book)
                 book_num += 1
+
                 db.session.add(new_book)
                 db.session.commit()
                 flash('Book was successfully added to the Library!')
@@ -158,10 +161,8 @@ class book_checkout(db.Model):
     
 
 
-
-
-
 # Ordered Books Model & Functionality
+from datetime import datetime
 class ordered_books(db.Model):
 
     # isbn is primary key
@@ -225,19 +226,48 @@ class ordered_books(db.Model):
                 return redirect(url_for('show_orders'))
         return render_template('create_order.html')  
     
+    @app.route('/update_order_status', methods=['GET', 'POST'])
+    def update_order_status ():
+        if request.method == 'POST':
+            isbn_add = request.form['isbn']
+            res = db.session.execute('SELECT * FROM ordered_books WHERE isbn = :inputISBN', {'inputISBN' : isbn_add})
+            if res == None:
+                flash('Check ISBN value. The entered ISBN is not present in the orders table')
+            else:
+                # first update order to received status
+                db.session.execute('UPDATE ordered_books SET received = 1 WHERE isbn = :inputISBN', {'inputISBN' : isbn_add})
+                db.session.commit()
+                # next, if books ordered do not exist in the library, add them
+                in_library = db.session.execute('SELECT isbn FROM library WHERE isbn = :inputISBN', {'inputISBN' : isbn_add})
+                # if in_library == None:
+                #     db.session.execute('INSERT INTO library SELECT isbn, title, author, genre, pub_date, publisher, ')
+
+                return redirect(url_for('show_orders'))
+        return render_template('update_order_status.html')
+
+
 # Memberships Model & Functionality
 class new_profiles(db.Model):
-    user_id = db.Column(db.Integer, primary_key=True, nullable=False)
+    user_id = db.Column(db.String(200), primary_key=True, nullable=False)
     first_name = db.Column(db.String(200), nullable=False)
     last_name = db.Column(db.String(200), nullable=False)
+    email_add = db.Column(db.String(200), nullable=False)
     address = db.Column(db.String(500), nullable=False)
+    phone_no = db.Column(db.String(500), nullable=False)
+    late_fee = db.Column(db.String(200), nullable=False)
+    on_waitlist = db.Column(db.String(200), nullable=False)
+    
 
     # constructor
-    def __init__(self, user_id, first_name, last_name, address):
+    def __init__(self, user_id, first_name, last_name, email_add, address, phone_no, late_fee, on_waitlist):
         self.user_id = user_id
         self.first_name = first_name
         self.last_name = last_name
+        self.email_add = email_add
         self.address = address
+        self.phone_no = phone_no
+        self.late_fee = late_fee
+        self.on_waitlist = on_waitlist
 
     @app.route('/show_users', methods = ['GET', 'POST'])
     def show_users():
@@ -246,11 +276,11 @@ class new_profiles(db.Model):
     @app.route('/create_users', methods = ['GET', 'POST'])
     def create_users():
         if request.method == 'POST':
-            if not request.form['first_name'] or not request.form['last_name'] or not request.form['address']:
+            if not request.form['user_id'] or not request.form['first_name'] or not request.form['last_name'] or not request.form['email_add'] or not request.form['address'] or not request.form['phone_no'] or not request.form['late_fee'] or not request.form['on_waitlist']:
                 flash('Please enter all required fields.', 'error')
             else:
                 global user_num
-                entered_user = new_profiles(user_num, request.form['first_name'], request.form['last_name'], request.form['address'])
+                entered_user = new_profiles(request.form['user_id'], request.form['first_name'], request.form['last_name'], request.form['email_add'], request.form['address'], request.form['phone_no'], request.form['late_fee'], request.form['on_waitlist'])
                 user_num += 1
                 db.session.add(entered_user)
                 db.session.commit()
