@@ -115,16 +115,19 @@ from datetime import datetime
 class ordered_books(db.Model):
 
     # isbn is primary key
-    isbn = db.Column(db.String(200), primary_key=True, nullable=False)
+    isbn = db.Column(db.Integer, primary_key=True, nullable=False)
     title = db.Column(db.String(200), nullable=False)
     author = db.Column(db.String(100), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     order_date = db.Column(db.DateTime, nullable=False)
     eta = db.Column(db.DateTime, nullable=False)
     received = db.Column(db.Boolean, nullable=False)
+    genre = db.Column(db.String(200), nullable=False)
+    pub_date = db.Column(db.DateTime, nullable=False)
+    publisher = db.Column(db.String(200), nullable=False)
 
     # constructor
-    def __init__(self, isbn, title, author, quantity, order_date, eta, received):
+    def __init__(self, isbn, title, author, quantity, order_date, eta, received, genre, pub_date, publisher):
         self.isbn = isbn
         self.title = title
         self.author = author
@@ -132,13 +135,16 @@ class ordered_books(db.Model):
         self.order_date = order_date
         self.eta = eta
         self.received = received
+        self.genre = genre
+        self.pub_date = pub_date
+        self.publisher = publisher  
     
     # query all ordered books
     @app.route('/show_orders', methods = ['GET', 'POST'])
     def show_orders():
         return render_template('show_orders.html', ordered_books = ordered_books.query.all())
     
-    # filter for ordered books
+    # filter for ordered books based on isbn, author name, or book title
     @app.route('/filter_orders', methods = ['GET', 'POST'])
     def filter_orders():
         if request.method == 'POST':
@@ -148,47 +154,62 @@ class ordered_books(db.Model):
                 result = db.session.execute('SELECT * FROM ordered_books WHERE isbn = :inputISBN', {'inputISBN' : request.form['search']})
             elif res == 'author':
                 flash('Book was successfully found!')
-                result = db.session.execute('SELECT * FROM ordered_books WHERE author = :inputAuthor', {'inputAuthor' : request.form['search']})
+                result = db.session.execute('SELECT * FROM ordered_books WHERE lower(author) = :inputAuthor', {'inputAuthor' : request.form['search'].lower()})
             elif res == 'title':
                 flash('Book was successfully found!')
-                result = db.session.execute('SELECT * FROM ordered_books WHERE title = :inputTitle', {'inputTitle' : request.form['search']})
+                result = db.session.execute('SELECT * FROM ordered_books WHERE lower(title) = :inputTitle', {'inputTitle' : request.form['search'].lower()})
             return render_template('filter_orders.html', returnOrderedBook = result)
-
         return render_template('filter_orders.html')
     
-    # adding an order
+    # adding an ordered book to database
     @app.route('/create_order', methods = ['GET', 'POST'])
     def create_order():
         if request.method == 'POST':
-            if not request.form['isbn'] or not request.form['title'] or not request.form['author'] or not request.form['quantity'] or not request.form['order_date'] or not request.form['ETA']:
+            if not request.form['isbn'] or not request.form['title'] or not request.form['author'] or not request.form['quantity'] or not request.form['order_date'] or not request.form['ETA'] or not request.form['genre'] or not request.form['publisher'] or not request.form['pub_date']:
                 flash('Cannot add order. Please enter all required fields.', 'error')
             else:
-                ordered_book = ordered_books(request.form['isbn'], request.form['title'], request.form['author'], int(request.form['quantity']), datetime.strptime(request.form['order_date'], '%m/%d/%Y'), datetime.strptime(request.form['ETA'], '%m/%d/%Y'), False)
+                ordered_book = ordered_books(int(request.form['isbn']), request.form['title'], request.form['author'], int(request.form['quantity']), datetime.strptime(request.form['order_date'], '%m/%d/%Y'), datetime.strptime(request.form['ETA'], '%m/%d/%Y'), False, request.form['genre'], datetime.strptime(request.form['pub_date'], '%m/%d/%Y'), request.form['publisher'])
                 db.session.add(ordered_book)
                 db.session.commit()
-                flash('Book order was submitted successfully.')
                 return redirect(url_for('show_orders'))
         return render_template('create_order.html')  
     
+    # logging a received ordered book shipment into library inventory and book tables   
     @app.route('/update_order_status', methods=['GET', 'POST'])
     def update_order_status ():
         if request.method == 'POST':
             isbn_add = request.form['isbn']
             res = db.session.execute('SELECT * FROM ordered_books WHERE isbn = :inputISBN', {'inputISBN' : isbn_add})
-            if res == None:
+            if res.one_or_none() == None:
                 flash('Check ISBN value. The entered ISBN is not present in the orders table')
             else:
                 # first update order to received status
                 db.session.execute('UPDATE ordered_books SET received = 1 WHERE isbn = :inputISBN', {'inputISBN' : isbn_add})
+                # check to see if isbn already exists in library
+                in_library = db.session.execute('SELECT isbn FROM library WHERE isbn = :inputISBN', {'inputISBN' : isbn_add}).one_or_none()
+                lst = []
+                for x in res:
+                    lst.append(tuple(x))
+                quantity_add = str(lst[0][3])
+                # if it's in the library already, update quantity
+                if in_library != None:
+                    q = 'UPDATE library SET total_quantity = total_quantity + :quant, available_quantity = available_quantity + :quant WHERE isbn = :inputISBN'
+                    params = {'quant': quantity_add, 'inputISBN':isbn_add}
+                    db.session.execute(q, params)  
+                else:
+                    # ordered book is not in the library, so add it 
+                    q = 'INSERT INTO library (isbn, title, author, genre, pub_date, publisher, total_quantity, available_quantity) SELECT isbn, title, author, genre, pub_date, publisher, :quant AS total_quantity, :quant AS available_quantity FROM ordered_books WHERE isbn = :inputISBN'
+                    params = {'quant': quantity_add, 'inputISBN':isbn_add}
+                    db.session.execute(q, params)
+                # NOTE: uncomment once books table PK is made to be auto_incremented
+                # in either situation, add the new copies to the book table (logs individual copies)
+                # insert_q = 'INSERT INTO books (isbn, checked_status) VALUES (:inputISBN, False)'
+                # params1 = {'inputISBN':isbn_add}
+                # for i in range(int(quantity_add)):
+                #     db.session.execute(insert_q, params1)
                 db.session.commit()
-                # next, if books ordered do not exist in the library, add them
-                in_library = db.session.execute('SELECT isbn FROM library WHERE isbn = :inputISBN', {'inputISBN' : isbn_add})
-                # if in_library == None:
-                #     db.session.execute('INSERT INTO library SELECT isbn, title, author, genre, pub_date, publisher, ')
-
-                return redirect(url_for('show_orders'))
+                return redirect(url_for('show_all'))
         return render_template('update_order_status.html')
-
 
 # Memberships Model & Functionality
 class new_profiles(db.Model):
