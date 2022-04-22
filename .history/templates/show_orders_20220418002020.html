@@ -17,15 +17,7 @@
            Management System</a>
      </h3> <br>
 
-     <h3> Ordered Books</h3>
-
-     <h3>
-      <a href = "{{ url_for('filter_orders') }}"> Search for Specific Orders</a>
-      </h3> <br>
-
-      <h3>
-         <a href = "{{ url_for('update_order_status') }}"> Log an Ordered Book Shipment</a>
-         </h3> <br>
+     <h3> Show Ordered Books</h3>
 
       <table class="styled-table">
          <thead>
@@ -33,13 +25,9 @@
                <th>ISBN</th>
                <th>Title</th>
                <th>Author</th>
-               <th>Genre</th>
-               <th>Publishing Date</th>
-               <th>Publisher</th>
                <th>Quantity</th>
                <th>Order Date</th>
                <th>ETA</th> 
-               <th> Received</th>
             </tr>
          </thead>
          
@@ -49,13 +37,9 @@
                   <td>{{ book.isbn }}</td>
                   <td>{{ book.title}}</td>
                   <td>{{ book.author}}</td>
-                  <td>{{ book.genre}}</td>
-                  <td>{{ book.pub_date}}</td>
-                  <td>{{ book.publisher}}</td>
                   <td>{{ book.quantity}}</td>
                   <td>{{ book.order_date}}</td>
                   <td>{{ book.eta}}</td>
-                  <td>{{ book.received}}</td>
                </tr>
             {% endfor %}
          </tbody>
@@ -64,4 +48,3 @@
    </body>
 
 </html>
-
