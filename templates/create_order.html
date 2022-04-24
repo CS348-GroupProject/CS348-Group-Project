@@ -1,5 +1,48 @@
 <!DOCTYPE html>
 <html>
+   <head> 
+      <style> 
+      input[type=text] {
+         width: 25%;
+         padding: 12px 20px;
+         margin: 8px 0;
+         box-sizing: border-box;
+         border: 2px solid grey;
+         border-radius: 4px;
+         }
+         input[type=date] {
+         width: 25%;
+         padding: 12px 20px;
+         margin: 8px 0;
+         box-sizing: border-box;
+         border: 2px solid grey;
+         border-radius: 4px;
+         }
+         .submit {
+         background-color: #4CAF50; /* Green */
+         border: none;
+         color: white;
+         padding: 15px 32px;
+         text-align: center;
+         text-decoration: none;
+         display: inline-block;
+         font-size: 16px;
+         }
+         .button {
+         background-color: gold;
+         border: none;
+         color: black;
+         padding: 15px 32px;
+         text-align: center;
+         text-decoration: none;
+         display: inline-block;
+         font-size: 16px;
+         margin: 4px 2px;
+         cursor: pointer;
+         box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+         }
+      </style>
+   </head>
    <body>
    
       <h3>Purdue - Place an Order to Library Database</h3>
@@ -28,18 +71,18 @@
          <input type = "text" name = "publisher" placeholder = "Enter publisher" /><br>
          
          <label for = "pub_date">Publishing Date</label><br>
-         <input type = "text" name = "pub_date" placeholder = "Enter publishing date" /><br>
+         <input type = "date" name = "pub_date" placeholder = "Enter publishing date" /><br>
          
          <label for = "quantity">Quantity</label><br>
          <input type = "text" name = "quantity" placeholder = "Enter quantity" /><br>
          
          <label for = "order_date">Order Date</label><br>
-         <input type = "text" name = "order_date" placeholder = "Enter date ordered" /><br>
+         <input type = "date" name = "order_date" placeholder = "Enter date ordered" /><br>
          
          <label for = "ETA">ETA</label><br>
-         <input type = "text" name = "ETA" placeholder = "Enter Estimated Time of Arrival (ETA)" /><br>
+         <input type = "date" name = "ETA" placeholder = "Enter Estimated Time of Arrival (ETA)" /><br>
          
-         <input type = "submit" value = "Place Order" />
+         <input type = "submit" value = "Place Order" class="button"/>
       </form>
       
    </body>

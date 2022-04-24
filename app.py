@@ -1,3 +1,4 @@
+import sqlite3
 from flask import Flask, request, flash, url_for, redirect, render_template
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
@@ -97,7 +98,7 @@ class library(db.Model):
 
 # Books Model & Functionality
 class books(db.Model):
-    book_id = db.Column(db.Integer, primary_key=True, nullable=False)
+    book_id = db.Column(db.Integer, primary_key=True, nullable=False, autoincrement=True)
     isbn = db.Column(db.String(200), nullable=False)
     checked_status = db.Column(db.Boolean, nullable=False)
 
@@ -224,30 +225,46 @@ class ordered_books(db.Model):
             if not request.form['isbn'] or not request.form['title'] or not request.form['author'] or not request.form['quantity'] or not request.form['order_date'] or not request.form['ETA'] or not request.form['genre'] or not request.form['publisher'] or not request.form['pub_date']:
                 flash('Cannot add order. Please enter all required fields.', 'error')
             else:
-                ordered_book = ordered_books(int(request.form['isbn']), request.form['title'], request.form['author'], int(request.form['quantity']), datetime.strptime(request.form['order_date'], '%m/%d/%Y'), datetime.strptime(request.form['ETA'], '%m/%d/%Y'), False, request.form['genre'], datetime.strptime(request.form['pub_date'], '%m/%d/%Y'), request.form['publisher'])
-                db.session.add(ordered_book)
+                has_order = db.session.execute('SELECT * FROM ordered_books WHERE isbn = :inputISBN', {'inputISBN' : request.form['isbn']}).first()
+                if has_order == None:
+                    ordered_book = ordered_books(int(request.form['isbn']), request.form['title'], request.form['author'], int(request.form['quantity']), datetime.strptime(request.form['order_date'], '%Y-%m-%d'), datetime.strptime(request.form['ETA'], '%Y-%m-%d'), False, request.form['genre'], datetime.strptime(request.form['pub_date'], '%Y-%m-%d'), request.form['publisher'])
+                    db.session.add(ordered_book)
+                    db.session.commit()
+                else:
+                    flash('There is already an order placed for the given ISBN. Please add to the quantity of the existing order.')
+                    return redirect(url_for('modify_existing_order'))
+                # return redirect(url_for('show_orders'))
+        return render_template('create_order.html')  
+    
+    # modify the quantity to an existing order
+    @app.route('/modify_existing_order', methods=['GET', 'POST'])
+    def modify_existing_order():
+        if request.method == 'POST':
+            if not request.form['isbn'] or not request.form['quantity']:
+                flash('Please enter all fields.')
+            else:
+                update_isbn = request.form['isbn']
+                updated_quantity = request.form['quantity']
+                db.session.execute('UPDATE ordered_books SET quantity = quantity + :inputQuantity WHERE isbn = :inputISBN', {'inputISBN' : update_isbn, 'inputQuantity':updated_quantity})
                 db.session.commit()
                 return redirect(url_for('show_orders'))
-        return render_template('create_order.html')  
+        return render_template('modify_existing_order.html')
     
     # logging a received ordered book shipment into library inventory and book tables   
     @app.route('/update_order_status', methods=['GET', 'POST'])
     def update_order_status ():
         if request.method == 'POST':
             isbn_add = request.form['isbn']
-            res = db.session.execute('SELECT * FROM ordered_books WHERE isbn = :inputISBN', {'inputISBN' : isbn_add})
-            if res.one_or_none() == None:
+            res = db.session.execute('SELECT * FROM ordered_books WHERE isbn = :inputISBN AND received = 0', {'inputISBN' : isbn_add}).first()
+            if res == None:
                 flash('Check ISBN value. The entered ISBN is not present in the orders table')
+                return redirect(url_for('update_order_status'))
+
             else:
-                # first update order to received status
                 db.session.execute('UPDATE ordered_books SET received = 1 WHERE isbn = :inputISBN', {'inputISBN' : isbn_add})
                 # check to see if isbn already exists in library
                 in_library = db.session.execute('SELECT isbn FROM library WHERE isbn = :inputISBN', {'inputISBN' : isbn_add}).one_or_none()
-                lst = []
-                for x in res:
-                    lst.append(tuple(x))
-                quantity_add = str(lst[0][3])
-                # if it's in the library already, update quantity
+                quantity_add = str(res[3])            
                 if in_library != None:
                     q = 'UPDATE library SET total_quantity = total_quantity + :quant, available_quantity = available_quantity + :quant WHERE isbn = :inputISBN'
                     params = {'quant': quantity_add, 'inputISBN':isbn_add}
@@ -257,12 +274,12 @@ class ordered_books(db.Model):
                     q = 'INSERT INTO library (isbn, title, author, genre, pub_date, publisher, total_quantity, available_quantity) SELECT isbn, title, author, genre, pub_date, publisher, :quant AS total_quantity, :quant AS available_quantity FROM ordered_books WHERE isbn = :inputISBN'
                     params = {'quant': quantity_add, 'inputISBN':isbn_add}
                     db.session.execute(q, params)
-                # NOTE: uncomment once books table PK is made to be auto_incremented
                 # in either situation, add the new copies to the book table (logs individual copies)
-                # insert_q = 'INSERT INTO books (isbn, checked_status) VALUES (:inputISBN, False)'
-                # params1 = {'inputISBN':isbn_add}
-                # for i in range(int(quantity_add)):
-                #     db.session.execute(insert_q, params1)
+                insert_q = 'INSERT INTO books (isbn, checked_status) VALUES (:inputISBN, 0)'
+                params1 = {'inputISBN':isbn_add}
+                for i in range(int(quantity_add)):
+                    db.session.execute(insert_q, params1)
+                db.session.execute('DELETE FROM ordered_books WHERE isbn = :inputISBN', {'inputISBN' : isbn_add})
                 db.session.commit()
                 return redirect(url_for('show_all'))
         return render_template('update_order_status.html')
