@@ -65,11 +65,12 @@
            Management System</a>
      </h3> <br>
 
-     <h3> Record Received Ordered Books</h3>
+     <h3> Modify an Existing Order</h3>
 
      <form action="{{request.path}}", method="post">
-        <label for="search">Enter ISBN of the newly arrived book:</label><br>
+        <label for="search">Enter ISBN of the book order you want to modify:</label><br>
         <input type="text", name="isbn", placeholder="Enter ISBN Number"/><br>
+        <input type="text", name="quantity", placeholder="Enter Quantity"> 
         <input type="submit" value="submit">
       </form>
 
