@@ -1,25 +1,64 @@
 <!DOCTYPE html>
 <html>
    <head>
-      <style>
-         table {border-collapse: collapse; margin: 25px 0;font-size: large;font-family: sans-serif;min-width: 400px;box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);}
-         th {padding: 12px 15px; background-color: black;}
-         thead {background-color:black;color: gold; text-align: left;}
-         tr {background-color:wheat; text-align: left;}
-         td {padding: 12px 15px; background-color: wheat;}
-         body{font-size: large;}
-      </style>
+      <style> 
+         input[type=text] {
+            width: 25%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            box-sizing: border-box;
+            border: 2px solid grey;
+            border-radius: 4px;
+            }
+            input[type=date] {
+            width: 25%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            box-sizing: border-box;
+            border: 2px solid grey;
+            border-radius: 4px;
+            }
+            .submit {
+            background-color: #4CAF50; /* Green */
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            }
+            .button {
+            background-color: gold;
+            border: none;
+            color: black;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+            }
+
+            table {border-collapse: collapse; margin: 25px 0;font-size: large;font-family: sans-serif;min-width: 400px;box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);}
+            th {padding: 12px 15px; background-color: black;}
+            thead {background-color:black;color: gold; text-align: left;}
+            tr {background-color:wheat; text-align: left;}
+            td {padding: 12px 15px; background-color: wheat;}
+            body{font-size: large;}
+         </style>
    </head>
    <body>
    
-      <h3>Purdue - Search Library Database</h3>
+      <h3>
+         <a href = "{{ url_for('show_all') }}">Purdue - Library 
+            Management System</a>
+      </h3>
       <hr/>
-      
-      {%- for category, message in get_flashed_messages(with_categories = true) %}
-         <div class = "alert alert-danger">
-            {{ message }}
-         </div>
-      {%- endfor %}
+
+      <h3> Search Books</h3>
 
     <form action = "{{ request.path }}" method = "post">
          <label for = "name">Search Library</label><br>
@@ -40,7 +79,7 @@
          <label for="publisher">Publisher</label><br>
 
          <input type = "text" name = "search" placeholder = "Search for Book Here!" /><br>
-         <input type = "submit" value = "Submit" />
+         <input type = "submit" value = "Submit" class="button"/>
       </form>
 
         <h3> Books Found </h3>

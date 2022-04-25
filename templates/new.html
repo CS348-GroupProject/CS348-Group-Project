@@ -1,15 +1,57 @@
 <!DOCTYPE html>
 <html>
+   <head>
+      <style> 
+         input[type=text] {
+            width: 25%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            box-sizing: border-box;
+            border: 2px solid grey;
+            border-radius: 4px;
+            }
+            input[type=date] {
+            width: 25%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            box-sizing: border-box;
+            border: 2px solid grey;
+            border-radius: 4px;
+            }
+            .submit {
+            background-color: #4CAF50; /* Green */
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            }
+            .button {
+            background-color: gold;
+            border: none;
+            color: black;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+            }
+         </style>
+   </head>
    <body>
    
-      <h3>Purdue - Add Book to Library Database</h3>
+      <h3>
+         <a href = "{{ url_for('show_all') }}">Purdue - Library 
+            Management System</a>
+      </h3>
       <hr/>
-      
-      {%- for category, message in get_flashed_messages(with_categories = true) %}
-         <div class = "alert alert-danger">
-            {{ message }}
-         </div>
-      {%- endfor %}
+
+      <h3> Add Book</h3>
       
       <form action = "{{ request.path }}" method = "post">
          <label for = "name">ISBN</label><br>
@@ -25,7 +67,7 @@
          <input type = "text" name = "genre" placeholder = "Enter genre" /><br>
          
          <label for = "pub_date">Publisher Date</label><br>
-         <input type = "text" name = "pub_date" placeholder = "Enter publisher date" /><br>
+         <input type = "text" name = "pub_date" placeholder = "mm/dd/yyyy" /><br>
          
          <label for = "publisher">Publisher</label><br>
          <input type = "text" name = "publisher" placeholder = "Enter publisher" /><br>
@@ -36,7 +78,7 @@
          <label for = "avail_quantity">Available Quantity</label><br>
          <input type = "text" name = "avail_quantity" placeholder = "Enter available quantity" /><br>
 
-         <input type = "submit" value = "Submit" />
+         <input type = "submit" value = "Submit" class="button"/>
       </form>
       
    </body>

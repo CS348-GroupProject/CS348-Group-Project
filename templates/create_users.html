@@ -1,15 +1,57 @@
 <!DOCTYPE html>
 <html>
+   <head> 
+      <style> 
+      input[type=text] {
+         width: 25%;
+         padding: 12px 20px;
+         margin: 8px 0;
+         box-sizing: border-box;
+         border: 2px solid grey;
+         border-radius: 4px;
+         }
+         input[type=date] {
+         width: 25%;
+         padding: 12px 20px;
+         margin: 8px 0;
+         box-sizing: border-box;
+         border: 2px solid grey;
+         border-radius: 4px;
+         }
+         .submit {
+         background-color: #4CAF50; /* Green */
+         border: none;
+         color: white;
+         padding: 15px 32px;
+         text-align: center;
+         text-decoration: none;
+         display: inline-block;
+         font-size: 16px;
+         }
+         .button {
+         background-color: gold;
+         border: none;
+         color: black;
+         padding: 15px 32px;
+         text-align: center;
+         text-decoration: none;
+         display: inline-block;
+         font-size: 16px;
+         margin: 4px 2px;
+         cursor: pointer;
+         box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+         }
+      </style>
+   </head>
    <body>
    
-      <h3>Purdue - Add New Profiles to Library Database</h3>
+      <h3>
+         <a href = "{{ url_for('show_all') }}">Purdue - Library 
+            Management System</a>
+      </h3>
       <hr/>
-      
-      {%- for category, message in get_flashed_messages(with_categories = true) %}
-         <div class = "alert alert-danger">
-            {{ message }}
-         </div>
-      {%- endfor %}
+
+      <h3> Create New Profile</h3>
       
       <form action = "{{ request.path }}" method = "post">
          <label for = "user_id">User ID</label><br>
@@ -39,7 +81,7 @@
 
          
          
-         <input type = "submit" value = "Enter New Profile" />
+         <input type = "submit" value = "Enter New Profile" class="button"/>
       </form>
       
    </body>

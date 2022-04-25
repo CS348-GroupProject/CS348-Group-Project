@@ -45,14 +45,13 @@
    </head>
    <body>
    
-      <h3>Purdue - Place an Order to Library Database</h3>
+      <h3>
+         <a href = "{{ url_for('show_all') }}">Purdue - Library 
+            Management System</a>
+      </h3>
       <hr/>
-      
-      {%- for category, message in get_flashed_messages(with_categories = true) %}
-         <div class = "alert alert-danger">
-            {{ message }}
-         </div>
-      {%- endfor %}
+
+      <h3> Place an Order</h3>
       
       <form action = "{{ request.path }}" method = "post">
          <label for = "name">ISBN</label><br>
