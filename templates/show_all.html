@@ -22,23 +22,23 @@
          {{ message }}
       {%- endfor %}
 		
-      <h3>Books (<a href = "{{ url_for('new') }}">Add Book
-         </a>)</h3>
+      <h3>Library Inventory - <a href = "{{ url_for('new') }}">Add Book
+         </a></h3>
       
-      <h3>Books (<a href = "{{ url_for('search') }}">Search Book
-         </a>)</h3>
+      <h3>Library Inventory - <a href = "{{ url_for('search') }}">Search Book
+         </a></h3>
 
-      <h3>Ordered Books (<a href = "{{ url_for('show_orders') }}"> Show Ordered Books
-         </a>)</h3>
+      <h3>Ordered Books - <a href = "{{ url_for('show_orders') }}">Show Ordered Books
+         </a></h3>
       
-      <h3>Ordered Books (<a href = "{{ url_for('create_order') }}"> Order a Book
-         </a>)</h3>
+      <h3>Ordered Books - <a href = "{{ url_for('create_order') }}">Order a Book
+         </a></h3>
 
-      <h3> New User (<a href = "{{ url_for('create_users') }}"> Create a Profile
-      </a>)</h3>
+      <h3>Memberships - <a href = "{{ url_for('create_users') }}">Create a Member
+      </a></h3>
 
-      <h3> New User (<a href = "{{ url_for('show_users') }}"> Show Profiles
-      </a>)</h3>
+      <h3>Memberships - <a href = "{{ url_for('show_users') }}">Show Members
+      </a></h3>
 
 
 
