@@ -3,10 +3,6 @@ from flask import Flask, request, flash, url_for, redirect, render_template
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import flask_sqlalchemy
-from jmespath import search
-from pytest import param
-from sympy import re
-
 
 app = Flask(__name__, template_folder='templates')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mydata.db'
@@ -329,15 +325,7 @@ class new_profiles(db.Model):
                 return redirect(url_for('show_users'))
         return render_template('create_users.html')
 
-@app.before_first_request
-def create_tables():
-    db.create_all()
-
-if __name__ == '__main__':
-   db.create_all()
-   app.run(debug = True)
-
-class waitlists(db.model):
+class waitlists(db.Model):
     isbn = db.Column(db.Integer, primary_key=True, nullable=False, index=True)
     user_id = db.Column(db.String(200), primary_key=False, nullable=False)
     time = db.Column(db.String(200), primary_key=False, nullable=False)
@@ -350,84 +338,143 @@ class waitlists(db.model):
     @app.route('/add_to_wailist', methods = ['GET', 'POST'])
     def add_to_waitlist():
 
-        # entered_user_and_book = waitlists(request.form['isbn'], request.form['user_id'], datetime.datetime.now())
+        if request.method == 'POST':
+            if not request.form['isbn'] or not request.form['user_id']:
+                flash('Cannot Add To Waitlist', 'error')
 
-        if not request.form['isbn'] or not request.form['user_id']:
-            flash('Cannot Add To Waitlist', 'error')
+            else:
+                isbn = request.form['isbn']
+                user_id = request.form['user_id']
 
-        else:
-            isbn = request.form['isbn']
-            user_id = request.form['user_id']
+                check_query = "SELECT * FROM new_profiles WHERE user_id = :user_id"
+                params_check = {'user_id': user_id}
+                check_results = db.session.execute(check_query, params_check)
 
-            q1 = "INSERT INTO waitlists VALUES ( :isbn, :user_id, :time )"
-            params1 = {'isbn' : isbn, 'user_id': user_id, 'time': str(datetime.now())}
-            db.session.execute(q1, params1)
-            db.session.commit()
+                check_query2 = "SELECT * FROM library WHERE isbn = :isbn AND available_quantity = 0"
+                params_check2 = {'isbn': isbn}
+                check_results2 = db.session.execute(check_query2, params_check2)
 
-            q2 = "UPDATE new_profiles SET on_waitlist = TRUE WHERE user_id = :user_id"
-            params2 = {'user_id': user_id}
-            db.session.execute(q2, params2)
-            db.session.commit()
+                if len(check_results) > 0 and len(check_results2) > 0:
 
-            flash('Added to waitlist successfully!')
+                    q1 = "INSERT INTO waitlists VALUES ( :isbn, :user_id, :time )"
+                    params1 = {'isbn' : isbn, 'user_id': user_id, 'time': str(datetime.now())}
+                    db.session.execute(q1, params1)
+                    db.session.commit()
 
-        return redirect(url_for('waitlist_main.html'))
+                    q2 = "UPDATE new_profiles SET on_waitlist = TRUE WHERE user_id = :user_id"
+                    params2 = {'user_id': user_id}
+                    db.session.execute(q2, params2)
+                    db.session.commit()
+
+                    flash('Added to waitlist successfully!')
+
+                else:
+                    return redirect(url_for('waitlist_main.html'))
+
+        return render_template('add_to_wailist.html')
     
     @app.route('/remove_from_wailist', methods = ['GET', 'POST'])
     def remove_from_waitlist():
 
-        if not request.form['isbn'] or not request.form['user_id']: 
-            flash('Cannot Remove From Waitlist', 'error')
+        if request.method == 'POST':
+            if not request.form['isbn'] or not request.form['user_id']: 
+                flash('Cannot Remove From Waitlist', 'error')
 
-        else:
-            isbn = request.form['isbn']
-            user_id = request.form['user_id']
+            else:
+                isbn = request.form['isbn']
+                user_id = request.form['user_id']
 
-            q1 = "DELETE FROM waitlists WHERE isbn = :isbn AND user_id = :user_id"
-            params1 = {'isbn' : isbn, 'user_id': user_id}
-            db.session.execute(q1, params1)
-            db.session.commit()
 
-            q2 = "SELECT * FROM waitlists WHERE user_id = :user_id"
-            params2 = {'user_id': user_id}
-            result2 = db.session.execute(q2, params2)
-            
-            if len(result2) <= 0:
-                q3 = "UPDATE new_profiles SET on_waitlist = FALSE WHERE user_id = :user_id"
-                params3 = {'user_id': user_id}
-                db.session.execute(q3, params3)
-                db.session.commit()
+                check_query = "SELECT * FROM new_profiles WHERE user_id = :user_id"
+                params_check = {'user_id': user_id}
+                check_results = db.session.execute(check_query, params_check)
 
-        return redirect(url_for('waitlist_main.html'))
+                check_query2 = "SELECT * FROM library WHERE isbn = :isbn AND available_quantity = 0"
+                params_check2 = {'isbn': isbn}
+                check_results2 = db.session.execute(check_query2, params_check2)
+
+                if len(check_results) > 0 and len(check_results2) > 0:
+
+                    q1 = "DELETE FROM waitlists WHERE isbn = :isbn AND user_id = :user_id"
+                    params1 = {'isbn' : isbn, 'user_id': user_id}
+                    db.session.execute(q1, params1)
+                    db.session.commit()
+
+                    q2 = "SELECT * FROM waitlists WHERE user_id = :user_id"
+                    params2 = {'user_id': user_id}
+                    result2 = db.session.execute(q2, params2)
+                    
+                    if len(result2) <= 0:
+                        q3 = "UPDATE new_profiles SET on_waitlist = FALSE WHERE user_id = :user_id"
+                        params3 = {'user_id': user_id}
+                        db.session.execute(q3, params3)
+                        db.session.commit()
+
+                    else:
+                        return redirect(url_for('waitlist_main.html'))
+
+        return render_template('remove_from_wailist.html')
     
-    @app.route('/show_book_wailist', methods = ['GET', 'POST'])
-    def show_book_waitlist():   
+    @app.route('/show_book_waitlist', methods = ['GET', 'POST'])
+    def show_book_waitlist():
 
         if not request.form['isbn']:     
             flash('Cannot Show Waitlist', 'error')
 
         else:
-            q1 = "SELECT isbn AS ISBN, user_id AS \"User ID\" FROM waitlists WHERE isbn = :isbn ORDER BY date(date)"
-            param1 = {'isbn': request.form['isbn']}
-            results1 = db.session.execute(q1, param1)
 
-            return render_template(url_for('waitlist_main.html'), search = results1)
+            check_query2 = "SELECT * FROM library WHERE isbn = :isbn AND available_quantity = 0"
+            params_check2 = {'isbn': isbn}
+            check_results2 = db.session.execute(check_query2, params_check2)
+
+            if len(check_results2) > 0:
+
+                isbn = request.form['isbn']
+
+                q1 = "SELECT isbn AS ISBN, user_id AS \"User ID\" FROM waitlists WHERE isbn = :isbn ORDER BY date(date)"
+                param1 = {'isbn': isbn}
+                results1 = db.session.execute(q1, param1)
+
+                waitlistFound = []
+                for x in results1:
+                    waitlistFound.append(tuple(x))
+
+                return render_template(url_for('show_book_waitlist.html'), waitlists = waitlistFound)
             
         return redirect(url_for('waitlist_main.html'))
 
-    @app.route('/show_user_wailist', methods = ['GET', 'POST'])
-    def show_user_waitliat():
+    @app.route('/show_user_waitlist', methods = ['GET', 'POST'])
+    def show_user_waitlist():
         
         if not request.form['user_id']:
             flash('Cannot Show Waitlist', 'error')
 
         else:
+
+            user_id = request.form['user_id']
+
+            check_query = "SELECT * FROM new_profiles WHERE user_id = :user_id"
+            params_check = {'user_id': user_id}
+            check_results = db.session.execute(check_query, params_check)
+
             q1 = "SELECT isbn AS ISBN, user_id AS \"User ID\" FROM waitlists WHERE user_id = :user_id ORDER BY date(date)"
-            param1 = {'user_id': request.form['user_id']}
+            param1 = {'user_id': user_id}
             results1 = db.session.execute(q1, param1)
 
-            return render_template(url_for('waitlist_main.html'), search = results1)
+            waitlistFound = []
+            for x in results1:
+                waitlistFound.append(tuple(x))
+
+            return render_template(url_for('show_user_waitlist.html'), waitlists = waitlistFound)
 
         return redirect(url_for('waitlist_main.html'))
+
+@app.before_first_request
+def create_tables():
+    db.create_all()
+
+if __name__ == '__main__':
+   db.create_all()
+   app.run(debug = True)
 
     
