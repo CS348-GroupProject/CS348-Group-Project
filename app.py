@@ -311,7 +311,32 @@ class new_profiles(db.Model):
 
     @app.route('/show_users', methods = ['GET', 'POST'])
     def show_users():
-        return render_template('show_users.html', new_profiles = new_profiles.query.all())
+        if request.method == 'POST':
+            if request.form['filters'] == 'user id':
+                result = db.session.execute('SELECT * FROM new_profiles WHERE user_id = :inputUserID', {'inputUserID' : request.form['search']})
+                return render_template('show_users.html', newProfiles = result)
+
+            elif request.form['filters'] == 'first name':
+                result = db.session.execute('SELECT * FROM new_profiles WHERE lower(first_name) = :inputFirstName', {'inputFirstName' : request.form['search'].lower()})
+                print(result)
+                return render_template('show_users.html', newProfiles = result)
+
+            elif request.form['filters'] == 'last name':
+                result = db.session.execute('SELECT * FROM new_profiles WHERE lower(last_name) = :inputLastName', {'inputLastName' : request.form['search'].lower()})
+                return render_template('show_users.html', newProfiles = result)
+
+            elif request.form['filters'] == 'email add':
+                result = db.session.execute('SELECT * FROM new_profiles WHERE lower(email_add) = :inputEmailAdd', {'inputEmailAdd' : request.form['search'].lower()})
+                return render_template('show_users.html', newProfiles = result)
+
+            elif request.form['filters'] == 'address':
+                result = db.session.execute('SELECT * FROM new_profiles WHERE lower(address) = :inputAdd', {'inputAdd' : request.form['search'].lower()})
+                return render_template('show_users.html', newProfiles = result)
+            
+            elif request.form['filters'] == 'phone no':
+                result = db.session.execute('SELECT * FROM new_profiles WHERE phone_no = :inputPhoneNo', {'inputPhoneNo' : request.form['search'].lower()})
+                return render_template('show_users.html', newProfiles = result)
+        return render_template('show_users.html')
 
     @app.route('/create_users', methods = ['GET', 'POST'])
     def create_users():
