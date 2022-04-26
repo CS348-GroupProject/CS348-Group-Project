@@ -3,6 +3,7 @@ from flask import Flask, request, flash, url_for, redirect, render_template
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import flask_sqlalchemy
+from pytest import param
 from sympy import re
 
 
@@ -336,34 +337,92 @@ if __name__ == '__main__':
    app.run(debug = True)
 
 class waitlists(db.model):
-    isbn = db.Column(db.Integer, primary_key=True, nullable=False)
+    isbn = db.Column(db.Integer, primary_key=True, nullable=False, index=True)
     user_id = db.Column(db.String(200), primary_key=False, nullable=False)
+    time = db.Column(db.String(200), primary_key=False, nullable=False)
 
-    def __init__(self, isbn, user_id):
+    def __init__(self, isbn, user_id, time):
         isbn = self.isbn
         user_id = self.user_id
+        time = str(datetime.now())
 
     @app.route('/add_to_wailist', methods = ['GET', 'POST'])
     def add_to_waitlist():
-        entered_user_and_book = waitlists(request.form['isbn'], request.form['user_id'])
-        db.session.add(entered_user_and_book)
-        db.session.commit()
-        flash('Added to waitlist successfully!')
+
+        # entered_user_and_book = waitlists(request.form['isbn'], request.form['user_id'], datetime.datetime.now())
+
+        if not request.form['isbn'] or not request.form['user_id']:
+            flash('Cannot Add To Waitlist', 'error')
+
+        else:
+            isbn = request.form['isbn']
+            user_id = request.form['user_id']
+
+            q1 = "INSERT INTO waitlists VALUES ( :isbn, :user_id, :time )"
+            params1 = {'isbn' : isbn, 'user_id': user_id, 'time': str(datetime.now())}
+            db.session.execute(q1, params1)
+            db.session.commit()
+
+            q2 = "UPDATE new_profiles SET on_waitlist = TRUE WHERE user_id = :user_id"
+            params2 = {'user_id': user_id}
+            db.session.execute(q2, params2)
+            db.session.commit()
+
+            flash('Added to waitlist successfully!')
+
         return redirect(url_for('waitlist_main.html'))
     
     @app.route('/remove_from_wailist', methods = ['GET', 'POST'])
     def remove_from_waitlist():
 
-        return ...
+        if not request.form['isbn'] or not request.form['user_id']: 
+            flash('Cannot Remove From Waitlist', 'error')
+
+        else:
+            isbn = request.form['isbn']
+            user_id = request.form['user_id']
+
+            q1 = "DELETE FROM waitlists WHERE isbn = :isbn AND user_id = :user_id"
+            params1 = {'isbn' : isbn, 'user_id': user_id}
+            db.session.execute(q1, params1)
+            db.session.commit()
+
+            q2 = "SELECT * FROM waitlists WHERE user_id = :user_id"
+            params2 = {'user_id': user_id}
+            result2 = db.session.execute(q2, params2)
+            
+            if len(result2) <= 0:
+                q3 = "UPDATE new_profiles SET on_waitlist = FALSE WHERE user_id = :user_id"
+                params3 = {'user_id': user_id}
+                db.session.execute(q3, params3)
+                db.session.commit()
+
+        return redirect(url_for('waitlist_main.html'))
     
     @app.route('/show_book_wailist', methods = ['GET', 'POST'])
     def show_book_waitlist():   
 
-        return ...
+        if not request.form['isbn']:     
+            flash('Cannot Show Waitlist', 'error')
+
+        else:
+            q1 = "SELECT isbn AS ISBN, user_id AS \"User ID\" FROM waitlists WHERE isbn = :isbn ORDER BY date(date)"
+            param1 = {'isbn': request.form['isbn']}
+            results1 = db.session.execute(q1, param1)
+            
+        return redirect(url_for('waitlist_main.html'))
 
     @app.route('/show_user_wailist', methods = ['GET', 'POST'])
     def show_user_waitliat():
         
-        return ...
+        if not request.form['user_id']:
+            flash('Cannot Show Waitlist', 'error')
+
+        else:
+            q1 = "SELECT isbn AS ISBN, user_id AS \"User ID\" FROM waitlists WHERE user_id = :user_id ORDER BY date(date)"
+            param1 = {'user_id': request.form['user_id']}
+            results1 = db.session.execute(q1, param1)
+
+        return redirect(url_for('waitlist_main.html'))
 
     

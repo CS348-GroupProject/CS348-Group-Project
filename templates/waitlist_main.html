@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <style>
+         table {border-collapse: collapse; margin: 25px 0;font-size: large;font-family: sans-serif;min-width: 400px;box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);}
+         th {padding: 12px 15px; background-color: black;}
+         thead {background-color:black;color: gold; text-align: left;}
+         tr {background-color:wheat; text-align: left;}
+         td {padding: 12px 15px; background-color: wheat;}
+         body{font-size: large;}
+      </style>
+   </head>
+   <body>
+   
+      <h3>Purdue - Library Wailists</h3>
+      <hr/>
+      
+      {%- for category, message in get_flashed_messages(with_categories = true) %}
+         <div class = "alert alert-danger">
+            {{ message }}
+         </div>
+      {%- endfor %}
+
+    <form action = "{{ request.path }}" method = "post">
+         <label for = "name">Search Waitlist</label><br>
+
+         <input type="radio" id="isbn" name="filter" value="ISBN" checked> 
+         <label for="isbn">ISBN</label><br>
+
+         <input type="radio" id="user_id" name="filter" value="UserID" checked> 
+         <label for="user_id">User ID</label><br>
+
+        </form>
+
+        <h3> Waitlist Found </h3>
+
+      <table class="styled-table">
+         <thead>
+            <tr>
+               <th>ISBN</th>
+               <th>UserID</th>
+            </tr>
+         </thead>
+         
+         <tbody>
+            {% for user in search %}
+               <tr>
+                  <td>{{ user[0] }}</td>
+                  <td>{{ user[1] }}</td>
+                  <td>{{ user[2] }}</td>
+                  <td>{{ user[3] }}</td>
+                  <td>{{ user[4] }}</td>
+                  <td>{{ user[5] }}</td>
+                  <td>{{ user[6] }}</td>
+                  <td>{{ user[7] }}</td>
+               </tr>
+            {% endfor %}
+         </tbody>
+      </table>
+   </body>
+</html>
