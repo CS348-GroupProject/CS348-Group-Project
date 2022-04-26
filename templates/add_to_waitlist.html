@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+   <body>
+   
+      <h3>Purdue - Add New Waitlist Request to Library</h3>
+      <hr/>
+      
+      {%- for category, message in get_flashed_messages(with_categories = true) %}
+         <div class = "alert alert-danger">
+            {{ message }}
+         </div>
+      {%- endfor %}
+      
+      <form action = "{{ request.path }}" method = "post">
+         <label for = "isbn">ISBN</label><br>
+         <input type = "text" name = "isbn" placeholder = "Enter ISBN" /><br>
+        
+         <label for = "user_id">Member ID</label><br>
+         <input type = "text" name = "user_id" placeholder = "Enter Member ID" /><br>
+                  
+         <input type = "submit" value = "New Waitlist Entry" />
+      </form>
+      
+   </body>
+</html>

@@ -3,6 +3,7 @@ from flask import Flask, request, flash, url_for, redirect, render_template
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import flask_sqlalchemy
+from sympy import re
 
 
 app = Flask(__name__, template_folder='templates')
@@ -333,3 +334,36 @@ def create_tables():
 if __name__ == '__main__':
    db.create_all()
    app.run(debug = True)
+
+class waitlists(db.model):
+    isbn = db.Column(db.Integer, primary_key=True, nullable=False)
+    user_id = db.Column(db.String(200), primary_key=False, nullable=False)
+
+    def __init__(self, isbn, user_id):
+        isbn = self.isbn
+        user_id = self.user_id
+
+    @app.route('/add_to_wailist', methods = ['GET', 'POST'])
+    def add_to_waitlist():
+        entered_user_and_book = waitlists(request.form['isbn'], request.form['user_id'])
+        db.session.add(entered_user_and_book)
+        db.session.commit()
+        flash('Added to waitlist successfully!')
+        return redirect(url_for('waitlist_main.html'))
+    
+    @app.route('/remove_from_wailist', methods = ['GET', 'POST'])
+    def remove_from_waitlist():
+
+        return ...
+    
+    @app.route('/show_book_wailist', methods = ['GET', 'POST'])
+    def show_book_waitlist():   
+
+        return ...
+
+    @app.route('/show_user_wailist', methods = ['GET', 'POST'])
+    def show_user_waitliat():
+        
+        return ...
+
+    
