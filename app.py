@@ -3,6 +3,7 @@ from flask import Flask, request, flash, url_for, redirect, render_template
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import flask_sqlalchemy
+from jmespath import search
 from pytest import param
 from sympy import re
 
@@ -409,6 +410,8 @@ class waitlists(db.model):
             q1 = "SELECT isbn AS ISBN, user_id AS \"User ID\" FROM waitlists WHERE isbn = :isbn ORDER BY date(date)"
             param1 = {'isbn': request.form['isbn']}
             results1 = db.session.execute(q1, param1)
+
+            return render_template(url_for('waitlist_main.html'), search = results1)
             
         return redirect(url_for('waitlist_main.html'))
 
@@ -422,6 +425,8 @@ class waitlists(db.model):
             q1 = "SELECT isbn AS ISBN, user_id AS \"User ID\" FROM waitlists WHERE user_id = :user_id ORDER BY date(date)"
             param1 = {'user_id': request.form['user_id']}
             results1 = db.session.execute(q1, param1)
+
+            return render_template(url_for('waitlist_main.html'), search = results1)
 
         return redirect(url_for('waitlist_main.html'))
 
