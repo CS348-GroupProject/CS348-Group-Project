@@ -199,7 +199,7 @@ class new_profiles(db.Model):
     address = db.Column(db.String(500), nullable=False)
     phone_no = db.Column(db.String(500), nullable=False)
     late_fee = db.Column(db.String(200), nullable=False)
-    on_waitlist = db.Column(db.String(200), nullable=False)
+    on_waitlist = db.Column(db.String(200), nullable=True)
     
 
     # constructor
@@ -220,10 +220,10 @@ class new_profiles(db.Model):
     @app.route('/create_users', methods = ['GET', 'POST'])
     def create_users():
         if request.method == 'POST':
-            if not request.form['user_id'] or not request.form['first_name'] or not request.form['last_name'] or not request.form['email_add'] or not request.form['address'] or not request.form['phone_no'] or not request.form['late_fee'] or not request.form['on_waitlist']:
+            if not request.form['user_id'] or not request.form['first_name'] or not request.form['last_name'] or not request.form['email_add'] or not request.form['address'] or not request.form['phone_no'] or not request.form['late_fee']:
                 flash('Please enter all required fields.', 'error')
             else:
-                entered_user = new_profiles(request.form['user_id'], request.form['first_name'], request.form['last_name'], request.form['email_add'], request.form['address'], request.form['phone_no'], request.form['late_fee'], request.form['on_waitlist'])
+                entered_user = new_profiles(request.form['user_id'], request.form['first_name'], request.form['last_name'], request.form['email_add'], request.form['address'], request.form['phone_no'], request.form['late_fee'], "")
                 db.session.add(entered_user)
                 db.session.commit()
                 flash('New profile was added successfully!')
