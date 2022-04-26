@@ -18,7 +18,7 @@ book_num = 0
 # Library Model & Functionality
 from datetime import datetime
 class library(db.Model):
-    isbn = db.Column(db.Integer, primary_key=True, nullable=False)
+    isbn = db.Column(db.Integer, primary_key=True, nullable=False, index=True)
     title = db.Column(db.String(200), nullable=False)
     author = db.Column(db.String(200), nullable=False)
     genre = db.Column(db.String(200), nullable=False)
@@ -37,6 +37,8 @@ class library(db.Model):
         self.total_quantity = total_quantity
         self.available_quantity = available_quantity
 
+    #db.session.execute('CREATE INDEX isbn_idx ON library(isbn);')
+
     @app.route('/')
     def show_all():
         return render_template('show_all.html', library_books = library.query.all())
@@ -47,47 +49,46 @@ class library(db.Model):
             if not request.form['isbn'] or not request.form['title'] or not request.form['author'] or not request.form['genre'] or not request.form['pub_date'] or not request.form['publisher'] or not request.form['total_quantity'] or not request.form['avail_quantity']:
                 flash('Please enter all the fields', 'error')
             else:
-                new_book = library(int(request.form['isbn']), request.form['title'], request.form['author'], request.form['genre'], datetime.strptime(request.form['pub_date'], '%m/%d/%Y'), request.form['publisher'], int(request.form['total_quantity']), int(request.form['avail_quantity']))
+                new_book = library(int(request.form['isbn']), request.form['title'], request.form['author'], request.form['genre'], datetime.strptime(request.form['pub_date'], '%Y-%m-%d'), request.form['publisher'], int(request.form['total_quantity']), int(request.form['avail_quantity']))
 
-                acc_book = books(book_num, int(request.form['isbn']), False)
-                db.session.add(acc_book)
-                book_num += 1
+                insert_q = 'INSERT INTO books (isbn, checked_status) VALUES (:inputISBN, 0)'
+                params1 = {'inputISBN':request.form['isbn']}
+
+                db.session.execute(insert_q, params1)
 
                 db.session.add(new_book)
                 db.session.commit()
-                flash('Book was successfully added to the Library!')
                 return redirect(url_for('show_all'))
         return render_template('new.html')
 
     @app.route('/search', methods = ['GET', 'POST'])
     def search():
         if request.method == 'POST':
-            flash('Book was successfully found!')
-            if request.form['filter'] == 'ISBN':
+            if request.form['filters'] == 'ISBN':
                 result = db.session.execute('SELECT * FROM library WHERE isbn = :inputISBN', {'inputISBN' : request.form['search']})
                 bookFound = []
                 for x in result:
                     bookFound.append(tuple(x))
                 return render_template('search.html', searchedBooks = bookFound)
-            elif request.form['filter'] == 'title':
+            elif request.form['filters'] == 'title':
                 result = db.session.execute('SELECT * FROM library WHERE lower(title) = :inputTitle', {'inputTitle' : request.form['search'].lower()})
                 bookFound = []
                 for x in result:
                     bookFound.append(tuple(x))
                 return render_template('search.html', searchedBooks = bookFound)
-            elif request.form['filter'] == 'author':
+            elif request.form['filters'] == 'author':
                 result = db.session.execute('SELECT * FROM library WHERE lower(author) = :inputAuthor', {'inputAuthor' : request.form['search'].lower()})
                 bookFound = []
                 for x in result:
                     bookFound.append(tuple(x))
                 return render_template('search.html', searchedBooks = bookFound)
-            elif request.form['filter'] == 'genre':
+            elif request.form['filters'] == 'genre':
                 result = db.session.execute('SELECT * FROM library WHERE lower(genre) = :inputGenre', {'inputGenre' : request.form['search'].lower()})
                 bookFound = []
                 for x in result:
                     bookFound.append(tuple(x))
                 return render_template('search.html', searchedBooks = bookFound)
-            elif request.form['filter'] == 'publisher':
+            elif request.form['filters'] == 'publisher':
                 result = db.session.execute('SELECT * FROM library WHERE lower(publisher) = :inputPublisher', {'inputPublisher' : request.form['search'].lower()})
                 bookFound = []
                 for x in result:
@@ -98,9 +99,11 @@ class library(db.Model):
 
 # Books Model & Functionality
 class books(db.Model):
-    book_id = db.Column(db.Integer, primary_key=True, nullable=False, autoincrement=True)
+    book_id = db.Column(db.Integer, primary_key=True, nullable=False, autoincrement=True, index = True)
     isbn = db.Column(db.String(200), nullable=False)
     checked_status = db.Column(db.Boolean, nullable=False)
+
+    #db.session.execute('CREATE INDEX book_id_idx ON books(book_id);')
 
     def __init__(self, book_id, isbn, checked_status):
         self.book_id = book_id
@@ -117,9 +120,11 @@ class books(db.Model):
 # Checkout Model & Functionality
 class book_checkout(db.Model):
     isbn = db.Column(db.Integer, primary_key=True, nullable=False)
-    user_id = db.Column(db.Integer, nullable=False)
+    user_id = db.Column(db.Integer, nullable=False, index = True)
     date_issued = db.Column(db.DateTime, nullable=False)
     date_due = db.Column(db.DateTime, nullable=False)
+
+    #db.session.execute('CREATE INDEX user_id_idx ON book_checkout(user_id);')
 
     #constructor
     def __init__(self, isbn, user_id, date_issued, date_due):
@@ -139,10 +144,9 @@ class book_checkout(db.Model):
             if not request.form['isbn'] or not request.form['user_id'] or not request.form['date_issued'] or not request.form['date_due']:
                 flash('Cannot Check Out', 'error')
             else:
-                check_book = book_checkout(int(request.form['isbn']), int(request.form['user_id']), datetime.strptime(request.form['date_issued'], '%m/%d/%Y'), datetime.strptime(request.form['date_due'], '%m/%d/%Y'))
+                check_book = book_checkout(int(request.form['isbn']), int(request.form['user_id']), datetime.strptime(request.form['date_issued'], '%Y-%m-%d'), datetime.strptime(request.form['date_due'], '%Y-%m-%d'))
                 db.session.add(check_book)
                 db.session.commit()
-                flash('Book Checkout was successfully.')
                 return redirect(url_for('show_checked'))
         return render_template('checkout_book.html')
     
@@ -155,7 +159,6 @@ class book_checkout(db.Model):
                 found_book = book_checkout.query.filter_by(isbn=int(request.form['isbn']), user_id=int(request.form['user_id']))
                 db.session.delete(found_book)
                 db.session.commit()
-                flash('Book Return was successfully.')
                 return redirect(url_for('show_checked'))
         return render_template('return_book.html')
 
@@ -167,7 +170,7 @@ from datetime import datetime
 class ordered_books(db.Model):
 
     # isbn is primary key
-    isbn = db.Column(db.Integer, primary_key=True, nullable=False)
+    isbn = db.Column(db.Integer, primary_key=True, nullable=False, index = True)
     title = db.Column(db.String(200), nullable=False)
     author = db.Column(db.String(100), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
@@ -191,6 +194,8 @@ class ordered_books(db.Model):
         self.pub_date = pub_date
         self.publisher = publisher  
     
+    #db.session.execute('CREATE INDEX ordered_books_idx ON ordered_books(isbn);')
+
     # query all ordered books
     @app.route('/show_orders', methods = ['GET', 'POST'])
     def show_orders():
@@ -202,18 +207,14 @@ class ordered_books(db.Model):
         if request.method == 'POST':
             res = request.form['filters']
             if res == 'isbn':
-                flash('Book was successfully found!')
                 result = db.session.execute('SELECT * FROM ordered_books WHERE isbn = :inputISBN', {'inputISBN' : request.form['search']})
             elif res == 'author':
-                flash('Book was successfully found!')
                 result = db.session.execute('SELECT * FROM ordered_books WHERE lower(author) = :inputAuthor', {'inputAuthor' : request.form['search'].lower()})
             elif res == 'title':
-                flash('Book was successfully found!')
                 result = db.session.execute('SELECT * FROM ordered_books WHERE lower(title) = :inputTitle', {'inputTitle' : request.form['search'].lower()})
             elif res == 'not received':
                 result = db.session.execute('SELECT * FROM ordered_books WHERE received = False')
             elif res == 'received':
-                flash('Book is successfully found')
                 result = db.session.execute('SELECT * FROM ordered_books WHERE received = True')
             return render_template('filter_orders.html', returnOrderedBook = result)
         return render_template('filter_orders.html')
@@ -286,7 +287,7 @@ class ordered_books(db.Model):
 
 # Memberships Model & Functionality
 class new_profiles(db.Model):
-    user_id = db.Column(db.String(200), primary_key=True, nullable=False)
+    user_id = db.Column(db.String(200), primary_key=True, nullable=False, index = True)
     first_name = db.Column(db.String(200), nullable=False)
     last_name = db.Column(db.String(200), nullable=False)
     email_add = db.Column(db.String(200), nullable=False)
@@ -295,7 +296,6 @@ class new_profiles(db.Model):
     late_fee = db.Column(db.String(200), nullable=False)
     on_waitlist = db.Column(db.String(200), nullable=False)
     
-
     # constructor
     def __init__(self, user_id, first_name, last_name, email_add, address, phone_no, late_fee, on_waitlist):
         self.user_id = user_id
@@ -306,6 +306,8 @@ class new_profiles(db.Model):
         self.phone_no = phone_no
         self.late_fee = late_fee
         self.on_waitlist = on_waitlist
+
+    #db.session.execute('CREATE INDEX member_idx ON new_profiles(user_id);')
 
     @app.route('/show_users', methods = ['GET', 'POST'])
     def show_users():
@@ -322,7 +324,6 @@ class new_profiles(db.Model):
                 user_num += 1
                 db.session.add(entered_user)
                 db.session.commit()
-                flash('New profile was added successfully!')
                 return redirect(url_for('show_users'))
         return render_template('create_users.html')
 

@@ -61,14 +61,14 @@
      </head>
    <body>
    
-      <h3>Purdue - Search Book Orders</h3>
+      <h3>
+         <a href = "{{ url_for('show_all') }}">Purdue - Library 
+            Management System</a>
+      </h3>
       <hr/>
+
+      <h3> Search Book Orders</h3>
       
-      {%- for category, message in get_flashed_messages(with_categories = true) %}
-         <div class = "alert alert-danger">
-            {{ message }}
-         </div>
-      {%- endfor %}
 
       <form action="{{request.path}}", method="post">
         <label for="filters">Choose a field to filter by:</label><br>
