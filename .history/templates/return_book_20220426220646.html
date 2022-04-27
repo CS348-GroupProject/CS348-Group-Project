@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <h3>
+      <a href="{{ url_for('show_all') }}">Purdue - Library Management System</a>
+    </h3>
+    <br />
+
+    {%- for category, message in get_flashed_messages(with_categories = true) %}
+    <div class="alert alert-danger">{{ message }}</div>
+    {%- endfor %}
+
+    <form action="{{ request.path }}" method="post">
+      <label for="isbn">isbn</label><br />
+      <input type="text" name="isbn" placeholder="Enter ISBN" /><br />
+
+      <label for="user_id">User ID</label><br />
+      <input type="text" name="user_id" placeholder="Enter User ID" /><br />
+      <input type="submit" value="Submit" />
+    </form>
+  </body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style> 
+      input[type=text] {
+         width: 25%;
+         padding: 12px 20px;
+         margin: 8px 0;
+         box-sizing: border-box;
+         border: 2px solid grey;
+         border-radius: 4px;
+         }
+         input[type=date] {
+         width: 25%;
+         padding: 12px 20px;
+         margin: 8px 0;
+         box-sizing: border-box;
+         border: 2px solid grey;
+         border-radius: 4px;
+         }
+         .submit {
+         background-color: #4CAF50; /* Green */
+         border: none;
+         color: white;
+         padding: 15px 32px;
+         text-align: center;
+         text-decoration: none;
+         display: inline-block;
+         font-size: 16px;
+         }
+         .button {
+         background-color: gold;
+         border: none;
+         color: black;
+         padding: 15px 32px;
+         text-align: center;
+         text-decoration: none;
+         display: inline-block;
+         font-size: 16px;
+         margin: 4px 2px;
+         cursor: pointer;
+         box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+         }
+         body{font-size: large;}
+      </style>
+ </head>
+  <body>
+    <h3>
+      <a href = "{{ url_for('show_all') }}">Purdue - Library 
+         Management System</a>
+   </h3>
+
+    <h3>Checkout Book</h3>
+    <hr />
+
+    <form action="{{ request.path }}" method="post">
+      <label for="isbn">ISBN</label><br />
+      <input type="text" name="isbn" placeholder="Enter ISBN" /><br />
+
+      <label for="user_id">User ID</label><br />
+      <input type="text" name="user_id" placeholder="Enter User ID" /><br />
+
+      <label for="date_issued">Date Issued</label><br />
+      <input
+        type="date"
+        name="date_issued"
+        placeholder="mm/dd/yyyy"
+      /><br />
+
+      <label for="date_due">Date Due</label><br />
+      <input type="date" name="date_due" placeholder="mm/dd/yyyy" /><br />
+
+      <input type="submit" value="Submit" class="button"/>
+    </form>
+  </body>
+</html>

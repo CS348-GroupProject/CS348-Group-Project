@@ -153,7 +153,7 @@ class book_checkout(db.Model):
                     db.session.commit()
                     return redirect(url_for('show_checked'))
                 else:
-                    flash('The book does not exist or there is no more availability. Please check the waitlist.', 'error')
+                    flash('The book does not exist or there is no more availability. Please check the waitlist.')
         return render_template('checkout_book.html')
     
     @app.route('/return_book', methods=['GET', 'POST'])
@@ -171,7 +171,7 @@ class book_checkout(db.Model):
                     db.session.commit()
                     return redirect(url_for('show_checked'))
                 else:
-                    flash("Book doesn't exist or the book has never been checked out", 'error')
+                    flash("Book doesn't exist or the book has never been checked out")
         return render_template('return_book.html')
 
     

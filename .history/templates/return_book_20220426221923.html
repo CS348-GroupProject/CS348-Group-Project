@@ -1,7 +1,36 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <style>
+      table {
+        border-collapse: collapse;
+        margin: 25px 0;
+        font-size: large;
+        font-family: sans-serif;
+        min-width: 400px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+      }
+      th {
+        padding: 12px 15px;
+        background-color: black;
+      }
+      thead {
+        background-color: black;
+        color: gold;
+        text-align: left;
+      }
+      tr {
+        background-color: wheat;
+        text-align: left;
+      }
+      td {
+        padding: 12px 15px;
+        background-color: wheat;
+      }
+      body {
+        font-size: large;
+      }
+
       input[type="text"] {
         width: 25%;
         padding: 12px 20px;
@@ -42,8 +71,13 @@
         box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2),
           0 6px 20px 0 rgba(0, 0, 0, 0.19);
       }
-      body {
-        font-size: large;
+
+      .root {
+        --radius: 2px;
+        --baseFg: dimgray;
+        --baseBg: white;
+        --accentFg: #006fc2;
+        --accentBg: #bae1ff;
       }
     </style>
   </head>
@@ -51,9 +85,12 @@
     <h3>
       <a href="{{ url_for('show_all') }}">Purdue - Library Management System</a>
     </h3>
+    <br />
+    <h3>Return Checked Out Books</h3>
 
-    <h3>Checkout Book</h3>
-    <hr />
+    {%- for category, message in get_flashed_messages(with_categories = true) %}
+    <div class="alert alert-danger">{{ message }}</div>
+    {%- endfor %}
 
     <form action="{{ request.path }}" method="post">
       <label for="isbn">ISBN</label><br />
@@ -61,18 +98,7 @@
 
       <label for="user_id">User ID</label><br />
       <input type="text" name="user_id" placeholder="Enter User ID" /><br />
-
-      <label for="date_issued">Date Issued</label><br />
-      <input type="date" name="date_issued" placeholder="mm/dd/yyyy" /><br />
-
-      <label for="date_due">Date Due</label><br />
-      <input type="date" name="date_due" placeholder="mm/dd/yyyy" /><br />
-
-      <input type="submit" value="Submit" class="button" />
+      <input type="submit" value="Submit" />
     </form>
-    <br />
-    {%- for category, message in get_flashed_messages(with_categories = true) %}
-    <div class="alert alert-danger">{{ message }}</div>
-    {%- endfor %}
   </body>
 </html>

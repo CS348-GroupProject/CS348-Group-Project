@@ -149,11 +149,9 @@ class book_checkout(db.Model):
                 if has_quantity != None and has_quantity.available_quantity > 0:
                     check_book = book_checkout(int(request.form['isbn']), int(request.form['user_id']), datetime.strptime(request.form['date_issued'], '%Y-%m-%d'), datetime.strptime(request.form['date_due'], '%Y-%m-%d'))
                     db.session.add(check_book)
-                    db.session.execute('UPDATE library SET available_quantity = available_quantity - :inputQuantity WHERE isbn = :inputISBN', {'inputISBN' : request.form['isbn'], 'inputQuantity':1})
+                    db.session.execute('UPDATE library SET quantity = quantity - :inputQuantity WHERE isbn = :inputISBN', {'inputISBN' : request.form['isbn'], 'inputQuantity':1})
                     db.session.commit()
-                    return redirect(url_for('show_checked'))
-                else:
-                    flash('The book does not exist or there is no more availability. Please check the waitlist.', 'error')
+                return redirect(url_for('show_checked'))
         return render_template('checkout_book.html')
     
     @app.route('/return_book', methods=['GET', 'POST'])
@@ -164,14 +162,12 @@ class book_checkout(db.Model):
             else:
                 has_quantity = db.session.execute('SELECT * FROM library WHERE isbn = :inputISBN', {'inputISBN' : request.form['isbn']}).first()
 
-                if has_quantity != None and has_quantity.available_quantity < has_quantity.total_quantity:
-                    found_book = book_checkout.query.filter_by(isbn=int(request.form['isbn']), user_id=int(request.form['user_id'])).first()
+                if has_quantity != None and has_quantity.available_quantity > has_quantity.total_quantity:
+                    found_book = book_checkout.query.filter_by(isbn=int(request.form['isbn']), user_id=int(request.form['user_id']))
                     db.session.delete(found_book)
-                    db.session.execute('UPDATE library SET available_quantity = available_quantity + :inputQuantity WHERE isbn = :inputISBN', {'inputISBN' : request.form['isbn'], 'inputQuantity':1})
+                    db.session.execute('UPDATE library SET quantity = quantity + :inputQuantity WHERE isbn = :inputISBN', {'inputISBN' : request.form['isbn'], 'inputQuantity':1})
                     db.session.commit()
-                    return redirect(url_for('show_checked'))
-                else:
-                    flash("Book doesn't exist or the book has never been checked out", 'error')
+                return redirect(url_for('show_checked'))
         return render_template('return_book.html')
 
     
