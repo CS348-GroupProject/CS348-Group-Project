@@ -363,7 +363,181 @@ class new_profiles(db.Model):
                 db.session.commit()
                 return redirect(url_for('show_users'))
         return render_template('create_users.html')
+    
+class waitlists(db.Model):
+    isbn = db.Column(db.Integer, primary_key=True, nullable=False, index=True)
+    user_id = db.Column(db.String(200), primary_key=False, nullable=False)
+    time = db.Column(db.String(200), primary_key=False, nullable=False)
 
+    def __init__(self, isbn, user_id, time):
+        isbn = self.isbn
+        user_id = self.user_id
+        time = str(datetime.now())
+
+    @app.route('/waitlist_main', methods = ['GET', 'POST'])
+    def waitlist_main():
+        flash("Please choose the next action")
+
+        return render_template('waitlist_main.html')
+    
+    @app.route('/add_to_waitlist', methods = ['GET', 'POST'])
+    def add_to_waitlist():
+
+        if request.method == 'POST':
+            if not request.form['isbn'] or not request.form['user_id']:
+                flash('Cannot Add To Waitlist. Please enter the required fields.', 'error')
+
+            else:
+                isbn = request.form['isbn']
+                user_id = request.form['user_id']
+
+                check_query = "SELECT * FROM new_profiles WHERE user_id = :user_id"
+                params_check = {'user_id': user_id}
+                check_results = db.session.execute(check_query, params_check)
+
+                check_query2 = "SELECT * FROM library WHERE isbn = :isbn AND available_quantity = 0"
+                params_check2 = {'isbn': isbn}
+                check_results2 = db.session.execute(check_query2, params_check2)
+
+                len1 = 0
+                len2 = 0
+
+                for x in check_results:
+                    len1 += 1
+
+                for x in check_results2:
+                    len2 += 1
+
+                if len1 > 0 and len2 > 0:
+
+                    q1 = "INSERT INTO waitlists VALUES ( :isbn, :user_id, :time )"
+                    params1 = {'isbn' : isbn, 'user_id': user_id, 'time': str(datetime.now())}
+                    db.session.execute(q1, params1)
+                    db.session.commit()
+
+                    q2 = "UPDATE new_profiles SET on_waitlist = TRUE WHERE user_id = :user_id"
+                    params2 = {'user_id': user_id}
+                    db.session.execute(q2, params2)
+                    db.session.commit()
+
+                    flash('Added to waitlist successfully!')
+
+                else:
+                    flash("ISBN or Member ID does not exist.")
+                    return redirect(url_for('waitlist_main'))
+
+        return render_template('add_to_waitlist.html')
+    
+    @app.route('/remove_from_wailist', methods = ['GET', 'POST'])
+    def remove_from_waitlist():
+
+        if request.method == 'POST':
+            if not request.form['isbn'] or not request.form['user_id']: 
+                flash('Cannot Add To Waitlist. Please enter the required fields.', 'error')
+
+            else:
+                isbn = request.form['isbn']
+                user_id = request.form['user_id']
+
+
+                check_query = "SELECT * FROM new_profiles WHERE user_id = :user_id"
+                params_check = {'user_id': user_id}
+                check_results = db.session.execute(check_query, params_check)
+
+                check_query2 = "SELECT * FROM library WHERE isbn = :isbn AND available_quantity = 0"
+                params_check2 = {'isbn': isbn}
+                check_results2 = db.session.execute(check_query2, params_check2)
+
+                len1 = 0
+                len2 = 0
+
+                for x in check_results:
+                    len1 += 1
+
+                for x in check_results2:
+                    len2 += 1
+
+                if len1 > 0 and len2 > 0:
+
+                    q1 = "DELETE FROM waitlists WHERE isbn = :isbn AND user_id = :user_id"
+                    params1 = {'isbn' : isbn, 'user_id': user_id}
+                    db.session.execute(q1, params1)
+                    db.session.commit()
+
+                    q2 = "SELECT * FROM waitlists WHERE user_id = :user_id"
+                    params2 = {'user_id': user_id}
+                    result2 = db.session.execute(q2, params2)
+                    
+                    check3 = 0
+
+                    for x in result2:
+                        check3 += 1
+
+                    if check3 <= 0:
+                        q3 = "UPDATE new_profiles SET on_waitlist = FALSE WHERE user_id = :user_id"
+                        params3 = {'user_id': user_id}
+                        db.session.execute(q3, params3)
+                        db.session.commit()
+
+                    else:       
+                        flash("ISBN or Member ID does not exist.")
+                        return redirect(url_for('waitlist_main.html'))
+
+        return render_template('remove_from_waitlist.html')
+
+    @app.route('/show_waitlist', methods = ['GET', 'POST'])
+    def show_waitlist():
+        if request.method == 'POST':
+
+            if not request.form['filters']:
+                flash('Cannot Show Waitlist. Please enter required fields.', 'error')
+
+            else: 
+
+                res = request.form['filters']
+                checkLen = 0
+
+                if res == 'isbn':
+
+                    isbn = request.form['search']
+
+                    check_query = "SELECT * FROM library WHERE isbn = :isbn AND available_quantity = 0"
+                    params_check = {'isbn': isbn}
+                    check_results = db.session.execute(check_query, params_check)
+
+                    for x in check_results:
+                        checkLen += 1
+
+                    if checkLen > 0:
+                        q1 = "SELECT * FROM waitlists WHERE isbn = :isbn ORDER BY date(time)"
+                        param1 = {'isbn': isbn}
+                        result = db.session.execute(q1, param1)
+                        return render_template('show_waitlist.html', returnedWaitlist = result)
+                    else:
+                        flash("Invalid ISBN entered.")
+
+                elif res == 'user_id':
+
+                    user_id = request.form['search']
+
+                    check_query = "SELECT * FROM new_profiles WHERE user_id = :user_id"
+                    params_check = {'user_id': user_id}
+                    check_results = db.session.execute(check_query, params_check)
+
+                    for x in check_results:
+                        checkLen += 1
+
+                    if checkLen > 0:
+                        q1 = "SELECT * FROM waitlists WHERE user_id = :user_id ORDER BY date(time)"
+                        param1 = {'user_id': user_id}
+                        result = db.session.execute(q1, param1)
+                        return render_template('show_waitlist.html', returnedWaitlist = result)
+                    else:
+                        flash("Invalid Member ID entered.")
+
+        return render_template('show_waitlist.html')
+ 
+    
 @app.before_first_request
 def create_tables():
     db.create_all()
