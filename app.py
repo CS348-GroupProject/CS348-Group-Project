@@ -509,8 +509,6 @@ class waitlists(db.Model):
                         param1 = {'isbn': isbn}
                         result = db.session.execute(q1, param1)
                         return render_template('show_waitlist.html', returnedWaitlist = result)
-                    else:
-                        flash("Invalid ISBN entered.")
 
                 elif res == 'user_id':
 
@@ -528,8 +526,6 @@ class waitlists(db.Model):
                         param1 = {'user_id': user_id}
                         result = db.session.execute(q1, param1)
                         return render_template('show_waitlist.html', returnedWaitlist = result)
-                    else:
-                        flash("Invalid Member ID entered.")
 
         return render_template('show_waitlist.html')
  
