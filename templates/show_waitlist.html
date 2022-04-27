@@ -86,6 +86,8 @@
            <tr>
               <th>ISBN</th>
               <th>Member ID</th>
+              <th>Member Name</th>
+              <th>Waitlisted On</th>
            </tr>
         </thead>
         
@@ -94,6 +96,8 @@
               <tr>
                  <td>{{ pair.isbn }}</td>
                  <td>{{ pair.user_id}}</td>
+                 
+                 <td>{{ pair.time}}</td>
               </tr>
            {% endfor %}
         </tbody>

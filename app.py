@@ -386,7 +386,7 @@ class waitlists(db.Model):
 
                 else:
                     flash("ISBN or Member ID does not exist.")
-                    return redirect(url_for('waitlist_main.html'))
+                    return redirect(url_for('waitlist_main'))
 
         return render_template('add_to_waitlist.html')
     
@@ -471,7 +471,7 @@ class waitlists(db.Model):
                         checkLen += 1
 
                     if checkLen > 0:
-                        q1 = "SELECT isbn, user_id FROM waitlists WHERE isbn = :isbn ORDER BY date(time)"
+                        q1 = "SELECT * FROM waitlists WHERE isbn = :isbn ORDER BY date(time)"
                         param1 = {'isbn': isbn}
                         result = db.session.execute(q1, param1)
                         return render_template('show_waitlist.html', returnedWaitlist = result)
@@ -490,7 +490,7 @@ class waitlists(db.Model):
                         checkLen += 1
 
                     if checkLen > 0:
-                        q1 = "SELECT isbn, user_id FROM waitlists WHERE user_id = :user_id ORDER BY date(time)"
+                        q1 = "SELECT * FROM waitlists WHERE user_id = :user_id ORDER BY date(time)"
                         param1 = {'user_id': user_id}
                         result = db.session.execute(q1, param1)
                         return render_template('show_waitlist.html', returnedWaitlist = result)
