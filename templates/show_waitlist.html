@@ -72,7 +72,7 @@
 
       <form action="{{request.path}}", method="post">
         <label for="filters">Choose a field to filter by:</label><br>
-        <select id="filters" name="filters" size="3" class="root">
+        <select id="filters" name="filters" size="2" class="root">
           <option value="isbn">ISBN Code</option>
           <option value="user_id">Member ID</option>
         </select><br><br>
@@ -86,7 +86,6 @@
            <tr>
               <th>ISBN</th>
               <th>Member ID</th>
-              <th>Member Name</th>
               <th>Waitlisted On</th>
            </tr>
         </thead>
@@ -96,7 +95,6 @@
               <tr>
                  <td>{{ pair.isbn }}</td>
                  <td>{{ pair.user_id}}</td>
-                 
                  <td>{{ pair.time}}</td>
               </tr>
            {% endfor %}
