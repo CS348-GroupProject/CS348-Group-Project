@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+           table {border-collapse: collapse; margin: 25px 0;font-size: large;font-family: sans-serif;min-width: 400px;box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);}
+           th {padding: 12px 15px; background-color: black;}
+           thead {background-color:black;color: gold; text-align: left;}
+           tr {background-color:wheat; text-align: left;}
+           td {padding: 12px 15px; background-color: wheat;}
+           body{font-size: large;}
+
+         input[type=text] {
+         width: 25%;
+         padding: 12px 20px;
+         margin: 8px 0;
+         box-sizing: border-box;
+         border: 2px solid grey;
+         border-radius: 4px;
+         }
+         input[type=date] {
+         width: 25%;
+         padding: 12px 20px;
+         margin: 8px 0;
+         box-sizing: border-box;
+         border: 2px solid grey;
+         border-radius: 4px;
+         }
+         .submit {
+         background-color: #4CAF50; /* Green */
+         border: none;
+         color: white;
+         padding: 15px 32px;
+         text-align: center;
+         text-decoration: none;
+         display: inline-block;
+         font-size: 16px;
+         }
+         .button {
+         background-color: gold;
+         border: none;
+         color: black;
+         padding: 15px 32px;
+         text-align: center;
+         text-decoration: none;
+         display: inline-block;
+         font-size: 16px;
+         margin: 4px 2px;
+         cursor: pointer;
+         box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+         }
+
+         .root {
+         --radius: 2px;
+         --baseFg: dimgray;
+         --baseBg: white;
+         --accentFg: #006fc2;
+         --accentBg: #bae1ff;
+         }
+
+        </style>
+     </head>
+   <body>
+   
+      <h3>Purdue - Search Book Orders</h3>
+      <hr/>
+      
+      {%- for category, message in get_flashed_messages(with_categories = true) %}
+         <div class = "alert alert-danger">
+            {{ message }}
+         </div>
+      {%- endfor %}
+
+      <form action="{{request.path}}", method="post">
+        <label for="filters">Choose a field to filter by:</label><br>
+        <select id="filters" name="filters" size="3" class="root">
+          <option value="isbn">ISBN Code</option>
+          <option value="user_id">Member ID</option>
+        </select><br><br>
+        <label for="search">Enter search value corresponding to your choice above:</label><br>
+        <input type="text", name="search", placeholder="Enter Search"/><br>
+        <input type="submit" value="submit" class="button">
+      </form>
+
+      <table class="styled-table">
+        <thead>
+           <tr>
+              <th>ISBN</th>
+              <th>Member ID</th>
+           </tr>
+        </thead>
+        
+        <tbody>
+           {% for pair in returnedWaitlist %}
+              <tr>
+                 <td>{{ pair.isbn }}</td>
+                 <td>{{ pair.user_id}}</td>
+              </tr>
+           {% endfor %}
+        </tbody>
+     </table>
+
+      
+   </body>
+</html>

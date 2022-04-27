@@ -21,28 +21,16 @@
          </div>
       {%- endfor %}
 
-    <!-- <form action = "{{ request.path }}" method = "post">
-         <label for = "name">Search Waitlist</label><br>
-
-         <input type="radio" id="isbn" name="filter" value="ISBN" checked> 
-         <label for="isbn">ISBN</label><br>
-
-         <input type="radio" id="user_id" name="filter" value="UserID" checked> 
-         <label for="user_id">User ID</label><br>
-
-        </form> -->
-
-        <h3>Add to Waitlist (<a href = "{{ url_for('add_to_waitlist') }}"> Order a Book
+        <h3>Add to Waitlist (<a href = "{{ url_for('add_to_waitlist') }}"> Add to Wailist
         </a>)</h3>
 
-        <h3> Remove From Waitlist (<a href = "{{ url_for('remove_from_waitlist') }}"> Create a Profile
+        <h3> Remove From Waitlist (<a href = "{{ url_for('remove_from_waitlist') }}"> Remove From Waitlist
         </a>)</h3>
 
-        <h3> Search Book Waitlist (<a href = "{{ url_for('show_book_waitlist') }}"> Show Profiles
-        </a>)</h3>
-
-        <h3> Search User Waitlist (<a href = "{{ url_for('show_user_waitlist') }}"> Wailists
+        <h3> Search for a Waitlist (<a href = "{{ url_for('show_waitlist') }}"> Seach for a Waitlist
         </a>)</h3>
 
    </body>
 </html>
+
+
