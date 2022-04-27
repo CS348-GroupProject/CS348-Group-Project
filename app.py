@@ -376,7 +376,6 @@ class waitlists(db.Model):
 
     @app.route('/waitlist_main', methods = ['GET', 'POST'])
     def waitlist_main():
-        flash("Please choose the next action")
 
         return render_template('waitlist_main.html')
     
@@ -419,9 +418,6 @@ class waitlists(db.Model):
                     params2 = {'user_id': user_id}
                     db.session.execute(q2, params2)
                     db.session.commit()
-
-                    flash('Added to waitlist successfully!')
-
                 else:
                     flash("ISBN or Member ID does not exist.")
                     return redirect(url_for('waitlist_main'))

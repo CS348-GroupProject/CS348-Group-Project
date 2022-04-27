@@ -12,23 +12,20 @@
    </head>
    <body>
    
-      <h3>Purdue - Library Wailists</h3>
+      <h3>
+         <a href = "{{ url_for('show_all') }}">Purdue - Library 
+            Management System</a>
+      </h3>
       <hr/>
-      
-      {%- for category, message in get_flashed_messages(with_categories = true) %}
-         <div class = "alert alert-danger">
-            {{ message }}
-         </div>
-      {%- endfor %}
 
-        <h3>Add to Waitlist (<a href = "{{ url_for('add_to_waitlist') }}"> Add to Wailist
-        </a>)</h3>
+        <h3>Add to Waitlist - <a href = "{{ url_for('add_to_waitlist') }}">Add to Wailist
+        </a></h3>
 
-        <h3> Remove From Waitlist (<a href = "{{ url_for('remove_from_waitlist') }}"> Remove From Waitlist
-        </a>)</h3>
+        <h3>Remove From Waitlist - <a href = "{{ url_for('remove_from_waitlist') }}">Remove From Waitlist
+        </a></h3>
 
-        <h3> Search for a Waitlist (<a href = "{{ url_for('show_waitlist') }}"> Seach for a Waitlist
-        </a>)</h3>
+        <h3>Search for a Waitlist - <a href = "{{ url_for('show_waitlist') }}">Seach for a Waitlist
+        </a></h3>
 
    </body>
 </html>
