@@ -374,6 +374,8 @@ class waitlists(db.Model):
         user_id = self.user_id
         time = str(datetime.now())
 
+    #db.session.execute('CREATE INDEX waitlist_isbn ON waitlists(isbn);')
+
     @app.route('/waitlist_main', methods = ['GET', 'POST'])
     def waitlist_main():
 
@@ -477,7 +479,7 @@ class waitlists(db.Model):
 
                     else:       
                         flash("ISBN or Member ID does not exist.")
-                        return redirect(url_for('waitlist_main.html'))
+                        return redirect(url_for('waitlist_main'))
 
         return render_template('remove_from_waitlist.html')
 
