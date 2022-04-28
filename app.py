@@ -364,6 +364,7 @@ class new_profiles(db.Model):
                 return redirect(url_for('show_users'))
         return render_template('create_users.html')
     
+# Waitlist Table stores the Member ID, ISBN, and Time of Waitlisting a book. 
 class waitlists(db.Model):
     isbn = db.Column(db.Integer, primary_key=True, nullable=False, index=True)
     user_id = db.Column(db.String(200), primary_key=False, nullable=False)
@@ -381,6 +382,7 @@ class waitlists(db.Model):
 
         return render_template('waitlist_main.html')
     
+    # Function to add a Member ID to a waitlist for a certain book. Also, inserts the time the waitlist entry was added.
     @app.route('/add_to_waitlist', methods = ['GET', 'POST'])
     def add_to_waitlist():
 
@@ -426,6 +428,7 @@ class waitlists(db.Model):
 
         return render_template('add_to_waitlist.html')
     
+    # Function to remove a Member from the waitlist for a certain book.
     @app.route('/remove_from_wailist', methods = ['GET', 'POST'])
     def remove_from_waitlist():
 
@@ -483,6 +486,7 @@ class waitlists(db.Model):
 
         return render_template('remove_from_waitlist.html')
 
+    # Function for users to search for a waitlist by a Member ID or by an ISBN.
     @app.route('/show_waitlist', methods = ['GET', 'POST'])
     def show_waitlist():
         if request.method == 'POST':
